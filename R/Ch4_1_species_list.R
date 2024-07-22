@@ -27,7 +27,11 @@ bird_data <- list.files(here("data", "Audio_output_combined"),
                         pattern = ".csv$", recursive = TRUE,
                         full.names = TRUE) %>%
   map_df(~ read_csv(file = .)) %>%
-  select(filepath, site, date, recording, start, end, scientific_name, common_name, confidence)
+  select(filepath, site, date, recording, start, end, scientific_name, common_name, confidence) %>%
+  mutate(site = str_split_i(filepath, pattern = "\\\\", i = 5),
+         recording = str_split_i(filepath, pattern = "\\\\", i = 6)) %>%
+  mutate(date = str_split_i(recording, pattern = ".WAV", i = 1) %>% as_datetime())
+
 
 
 
