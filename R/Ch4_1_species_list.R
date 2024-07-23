@@ -50,7 +50,7 @@ load(here("bird_data_cleaned.RData"))
 bird_data_0.9 <- read_csv(here("data", "Bird_list", "species_validation_raw.csv"))
 
 # listen to the target recordings
-for (i in 1:5) {
+for (i in 152:200) {
   
   print(paste0("This is ", bird_data_0.9$common_name[i], 
                " for row ", i + 1, 
