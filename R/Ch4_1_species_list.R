@@ -23,33 +23,37 @@ library(here)
 species_list_full <- read_csv(here("data", "Bird_list", "Clements-v2023-October-2023.csv"))
 
 # bird detections from 3 years of data
-bird_data <- list.files(here("data", "Audio_output_combined"),
-                        pattern = ".csv$", recursive = TRUE,
-                        full.names = TRUE) %>%
-  map_df(~ read_csv(file = .)) %>%
-  select(filepath, site, date, recording, start, end, scientific_name, common_name, confidence) %>%
-  mutate(site = str_split_i(filepath, pattern = "\\\\", i = 5),
-         recording = str_split_i(filepath, pattern = "\\\\", i = 6)) %>%
-  mutate(date = str_split_i(recording, pattern = ".WAV", i = 1) %>% as_datetime())
+# bird_data <- list.files(here("data", "Audio_output_combined"),
+#                         pattern = ".csv$", recursive = TRUE,
+#                         full.names = TRUE) %>%
+#   map_df(~ read_csv(file = .)) 
+# 
+# bird_data_cleaned <- bird_data %>%
+#   mutate(site = str_split_i(filepath, pattern = "\\\\", i = -2),
+#          recording = str_split_i(filepath, pattern = "\\\\", i = -1)) %>%
+#   mutate(date = str_split_i(recording, pattern = ".WAV", i = 1) %>% as_datetime()) 
+#
+# save(bird_data_cleaned, file = here("bird_data_cleaned.RData"))
+
+load(here("bird_data_cleaned.RData"))
 
 
-
-
-# species list validation with 0.9 ----------------------------------------
+# species list validation with 0.975 --------------------------------------
 
 # save the list for further listening validation
-bird_data_0.9 <- bird_data %>%
-  filter(confidence >= 0.9) %>%
-  slice_max(order_by = confidence, n = 2, by = scientific_name, with_ties = FALSE)
+# bird_data_0.9 <- bird_data_cleaned %>%
+#   filter(confidence >= 0.975) %>% # 155 species
+#   slice_max(order_by = confidence, n = 5, by = scientific_name, with_ties = FALSE)
+#
+# write_csv(bird_data_0.9, here("data", "Bird_list", "species_validation_raw.csv"))
 
-write_csv(bird_data_0.9, here("data", "Bird_list", "species_validation_raw.csv"))
-
+bird_data_0.9 <- read_csv(here("data", "Bird_list", "species_validation_raw.csv"))
 
 # listen to the target recordings
-for (i in 1:nrow(bird_data_0.9)) {
+for (i in 1:5) {
   
   print(paste0("This is ", bird_data_0.9$common_name[i], 
-               " for row ", i, 
+               " for row ", i + 1, 
                " from ", bird_data_0.9$start[i], 
                " to ", bird_data_0.9$end[i]))
   
@@ -62,14 +66,16 @@ for (i in 1:nrow(bird_data_0.9)) {
 
 
 # filter out false detections base on listening result, expert opinion, and fix the name 
-species_list <- read_csv(here("data", "Bird_list", "species_validation_processed.csv")) %>%
+species_list <- read_csv(here("data", "Bird_list", "species_validation_processed.csv")) 
+
+species_list_cleaned %>%
   group_by(scientific_name) %>%
   filter(any(validation == "Y")) %>%
   distinct(scientific_name, common_name) %>%
   left_join(select(species_list, `scientific name`, `English name`, order, family), 
             by = join_by(scientific_name == `scientific name`))
 
-write_csv(species_list, here("data", "Bird_list", "species_list_aru.csv"))
+write_csv(species_list_cleaned, here("data", "Bird_list", "species_list_aru.csv"))
 
 # c("Pygmy Nuthatch", 
 #   "Red-naped Sapsucker", 
