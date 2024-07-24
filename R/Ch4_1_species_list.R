@@ -22,6 +22,12 @@ library(here)
 # standard species list 
 species_list_full <- read_csv(here("data", "Bird_list", "Clements-v2023-October-2023.csv"))
 
+# old species list produced by previous BirdNET model with 0.85 threshold
+species_list_old <- read_csv(here("data", "Bird_list", "species_validation_old_model_version.csv")) %>%
+  filter(ARU == "Y") %>%
+  mutate(scientific_name = `scientific name`) %>%
+  select(common_name, scientific_name)
+
 # bird detections from 3 years of data
 # bird_data <- list.files(here("data", "Audio_output_combined"),
 #                         pattern = ".csv$", recursive = TRUE,
@@ -50,7 +56,7 @@ load(here("bird_data_cleaned.RData"))
 bird_data_0.9 <- read_csv(here("data", "Bird_list", "species_validation_raw.csv"))
 
 # listen to the target recordings
-for (i in 152:200) {
+for (i in 521:550) {
   
   print(paste0("This is ", bird_data_0.9$common_name[i], 
                " for row ", i + 1, 
@@ -65,27 +71,42 @@ for (i in 152:200) {
 }
 
 
-# filter out false detections base on listening result, expert opinion, and fix the name 
+
+# producing the species list from the validated data ----------------------
+
+# filter out false detections base on listening result: 155 -> 98
 species_list <- read_csv(here("data", "Bird_list", "species_validation_processed.csv")) 
 
-species_list_cleaned %>%
+species_list_1 <- species_list %>%
   group_by(scientific_name) %>%
   filter(any(validation == "Y")) %>%
-  distinct(scientific_name, common_name) %>%
+  distinct(scientific_name, common_name)
+
+# add potential missed species as we set the threshold very high: 98 -> 115
+species_list_2 <- species_list_1 %>%
+  bind_rows(setdiff(species_list_old, species_list_1))
+  
+# remove the species that won't happen in the area, ask Ken
+
+
+
+
+
+
   left_join(select(species_list, `scientific name`, `English name`, order, family), 
             by = join_by(scientific_name == `scientific name`))
 
 write_csv(species_list_cleaned, here("data", "Bird_list", "species_list_aru.csv"))
 
-# c("Pygmy Nuthatch", 
-#   "Red-naped Sapsucker", 
-#   "Williamson's Sapsucker", 
-#   "Bay-breasted Warbler", 
-#   "Bushtit", 
-#   "American Tree Sparrow",
-#   "Arctic Warbler",
-#   "Blue-headed Vireo",
-#   "Connecticut Warbler"))
+test <- c("Pygmy Nuthatch",
+  "Red-naped Sapsucker",
+  "Williamson's Sapsucker",
+  "Bay-breasted Warbler",
+  "Bushtit",
+  "American Tree Sparrow",
+  "Arctic Warbler",
+  "Blue-headed Vireo",
+  "Connecticut Warbler")
   
 # common_name == "Audubon's Warbler" ~ "Yellow-rumped Warbler",
 # common_name == "Northwestern Crow" ~ "American Crow",
