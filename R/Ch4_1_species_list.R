@@ -53,19 +53,19 @@ load(here("bird_data_cleaned.RData"))
 #
 # write_csv(bird_data_0.9, here("data", "Bird_list", "species_validation_raw.csv"))
 
-bird_data_0.9 <- read_csv(here("data", "Bird_list", "species_validation_raw.csv"))
+bird_data_0.975 <- read_csv(here("data", "Bird_list", "species_validation_raw.csv"))
 
 # listen to the target recordings
 for (i in 521:550) {
   
-  print(paste0("This is ", bird_data_0.9$common_name[i], 
+  print(paste0("This is ", bird_data_0.975$common_name[i], 
                " for row ", i + 1, 
-               " from ", bird_data_0.9$start[i], 
-               " to ", bird_data_0.9$end[i]))
+               " from ", bird_data_0.975$start[i], 
+               " to ", bird_data_0.975$end[i]))
   
-  song <- readWave(paste0(bird_data_0.9$filepath[i]),
-                   from = (bird_data_0.9$start[i] - 2),
-                   to = (bird_data_0.9$end[i] + 2),
+  song <- readWave(paste0(bird_data_0.975$filepath[i]),
+                   from = (bird_data_0.975$start[i] - 2),
+                   to = (bird_data_0.975$end[i] + 2),
                    units = "seconds") %>%
     play(, ... = "/play /close")
 }
