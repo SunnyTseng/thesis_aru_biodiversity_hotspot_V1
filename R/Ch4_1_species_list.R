@@ -22,11 +22,8 @@ library(here)
 # standard species list 
 species_list_full <- read_csv(here("data", "Bird_list", "Clements-v2023-October-2023.csv"))
 
-# old species list produced by previous BirdNET model with 0.85 threshold
-species_list_old <- read_csv(here("data", "Bird_list", "species_validation_old_model_version.csv")) %>%
-  filter(ARU == "Y") %>%
-  mutate(scientific_name = `scientific name`) %>%
-  select(common_name, scientific_name)
+# species list in BC atlas
+species_list_BC <- read_csv(here("data", "Bird_list", "species_bc_breeding_bird_atlas.csv"))
 
 # bird detections from 3 years of data
 # bird_data <- list.files(here("data", "Audio_output_combined"),
@@ -74,39 +71,34 @@ for (i in 521:550) {
 
 # producing the species list from the validated data ----------------------
 
-# filter out false detections base on listening result: 155 -> 98
-species_list <- read_csv(here("data", "Bird_list", "species_validation_processed.csv")) 
+# basic species list: the intersection of the BirdNET_0.85 and the BC list
+species_list_basic <- bird_data_cleaned %>%
+  filter(confidence >= 0.8) %>%
+  distinct(scientific_name, common_name) %>%
+  inner_join(species_list_BC)
 
-species_list_1 <- species_list %>%
+# additional species list: listening through all the species detected above 0.975 and validate 
+species_list_additional <- read_csv(here("data", "Bird_list", "species_validation_processed.csv")) %>%
   group_by(scientific_name) %>%
   filter(any(validation == "Y")) %>%
-  distinct(scientific_name, common_name)
-
-# add potential missed species as we set the threshold very high: 98 -> 115
-species_list_2 <- species_list_1 %>%
-  bind_rows(setdiff(species_list_old, species_list_1))
+  distinct(scientific_name, common_name) %>%
+  full_join(species_list_basic)
   
 # remove the species that won't happen in the area, ask Ken
 
+write_csv(species_list_additional, here("data", "Bird_list", "species_list_additional.csv"))
 
 
 
-
-
-  left_join(select(species_list, `scientific name`, `English name`, order, family), 
-            by = join_by(scientific_name == `scientific name`))
-
-write_csv(species_list_cleaned, here("data", "Bird_list", "species_list_aru.csv"))
-
-test <- c("Pygmy Nuthatch",
-  "Red-naped Sapsucker",
-  "Williamson's Sapsucker",
-  "Bay-breasted Warbler",
-  "Bushtit",
-  "American Tree Sparrow",
-  "Arctic Warbler",
-  "Blue-headed Vireo",
-  "Connecticut Warbler")
+# test <- c("Pygmy Nuthatch",
+#   "Red-naped Sapsucker",
+#   "Williamson's Sapsucker",
+#   "Bay-breasted Warbler",
+#   "Bushtit",
+#   "American Tree Sparrow",
+#   "Arctic Warbler",
+#   "Blue-headed Vireo",
+#   "Connecticut Warbler")
   
 # common_name == "Audubon's Warbler" ~ "Yellow-rumped Warbler",
 # common_name == "Northwestern Crow" ~ "American Crow",
@@ -129,8 +121,8 @@ bird_data_target <- bird_data %>%
 #        hour %in% c(4, 5, 6),
 #        minute %in% seq(0, 60, by = 5))
 
+# save(bird_data_target_species, file = here("bird_data_target_species.RData"))
 
-write_csv(bird_data_target, here("data", "Bird_list", "bird_data_full_target_species.csv"))
 
 
 

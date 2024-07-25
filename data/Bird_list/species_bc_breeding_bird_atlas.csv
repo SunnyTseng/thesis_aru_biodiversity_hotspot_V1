@@ -1,0 +1,180 @@
+code,common_name
+CAGO,Canada Goose
+TRUS,Trumpeter Swan
+WODU,Wood Duck
+AMWI,American Wigeon
+MALL,Mallard
+BWTE,Blue-winged Teal
+CITE,Cinnamon Teal
+NOSL,Northern Shoveler
+NOPI,Northern Pintail
+GWTE,Green-winged Teal
+RNDU,Ring-necked Duck
+LESC,Lesser Scaup
+WWSC,White-winged Scoter
+BUFF,Bufflehead
+COGO,Common Goldeneye
+BAGO,Barrow's Goldeneye
+HOME,Hooded Merganser
+COME,Common Merganser
+RUDU,Ruddy Duck
+RUGR,Ruffed Grouse
+SPGR,Spruce Grouse
+WIPT,Willow Ptarmigan
+WTPT,White-tailed Ptarmigan
+DUGR,Dusky Grouse
+STGR,Sharp-tailed Grouse
+COLO,Common Loon
+PBGR,Pied-billed Grebe
+HOGR,Horned Grebe
+RNGR,Red-necked Grebe
+EAGR,Eared Grebe
+AMBI,American Bittern
+GBHE,Great Blue Heron
+TUVU,Turkey Vulture
+OSPR,Osprey
+BAEA,Bald Eagle
+NOHA,Northern Harrier
+SSHA,Sharp-shinned Hawk
+COHA,Cooper's Hawk
+NOGO,Northern Goshawk
+BWHA,Broad-winged Hawk
+RTHA,Red-tailed Hawk
+GOEA,Golden Eagle
+AMKE,American Kestrel
+MERL,Merlin
+VIRA,Virginia Rail
+SORA,Sora
+AMCO,American Coot
+SACR,Sandhill Crane
+KILL,Killdeer
+SPSA,Spotted Sandpiper
+SOSA,Solitary Sandpiper
+GRYE,Greater Yellowlegs
+LBCU,Long-billed Curlew
+WISN,Wilson's Snipe
+WIPH,Wilson's Phalarope
+BOGU,Bonaparte's Gull
+BLTE,Black Tern
+ROPI,Rock Pigeon
+MODO,Mourning Dove
+GHOW,Great Horned Owl
+NHOW,Northern Hawk Owl
+NPOW,Northern Pygmy-Owl
+BDOW,Barred Owl
+GGOW,Great Gray Owl
+LEOW,Long-eared Owl
+SEOW,Short-eared Owl
+BOOW,Boreal Owl
+NSWO,Northern Saw-whet Owl
+CONI,Common Nighthawk
+BLSW,Black Swift
+VASW,Vaux's Swift
+CAHU,Calliope Hummingbird
+RUHU,Rufous Hummingbird
+BEKI,Belted Kingfisher
+YBSA,Yellow-bellied Sapsucker
+RNSA,Red-naped Sapsucker
+RBSA,Red-breasted Sapsucker
+SAPS,Unknown Sapsucker
+SAHY,Sapsucker hybrid
+DOWO,Downy Woodpecker
+HAWO,Hairy Woodpecker
+ATTW,American Three-toed Woodpecker
+BBWO,Black-backed Woodpecker
+NOFL,Northern Flicker
+PIWO,Pileated Woodpecker
+OSFL,Olive-sided Flycatcher
+WWPE,Western Wood-Pewee
+YBFL,Yellow-bellied Flycatcher
+ALFL,Alder Flycatcher
+WIFL,Willow Flycatcher
+LEFL,Least Flycatcher
+HAFL,Hammond's Flycatcher
+DUFL,Dusky Flycatcher
+PSFL,Pacific-slope Flycatcher
+EAKI,Eastern Kingbird
+CAVI,Cassin's Vireo
+WAVI,Warbling Vireo
+REVI,Red-eyed Vireo
+GRJA,Gray Jay
+STJA,Steller's Jay
+BLJA,Blue Jay
+BBMA,Black-billed Magpie
+AMCR,American Crow
+CORA,Common Raven
+HOLA,Horned Lark
+TRSW,Tree Swallow
+VGSW,Violet-green Swallow
+NRWS,Northern Rough-winged Swallow
+BKSW,Bank Swallow
+CLSW,Cliff Swallow
+BASW,Barn Swallow
+BCCH,Black-capped Chickadee
+MOCH,Mountain Chickadee
+CBCH,Chestnut-backed Chickadee
+BOCH,Boreal Chickadee
+RBNU,Red-breasted Nuthatch
+BRCR,Brown Creeper
+HOWR,House Wren
+WIWR,Pacific/Winter Wren
+PAWR,Pacific Wren
+MAWR,Marsh Wren
+AMDI,American Dipper
+GCKI,Golden-crowned Kinglet
+RCKI,Ruby-crowned Kinglet
+MOBL,Mountain Bluebird
+TOSO,Townsend's Solitaire
+SWTH,Swainson's Thrush
+HETH,Hermit Thrush
+AMRO,American Robin
+VATH,Varied Thrush
+GRCA,Gray Catbird
+EUST,European Starling
+AMPI,American Pipit
+BOWA,Bohemian Waxwing
+CEWA,Cedar Waxwing
+TEWA,Tennessee Warbler
+OCWA,Orange-crowned Warbler
+YEWA,Yellow Warbler
+MGNW,Magnolia Warbler
+YRWA,Yellow-rumped Warbler
+AUWA,Yellow-rumped Warbler (Audubon's)
+TOWA,Townsend's Warbler
+BKPW,Blackpoll Warbler
+AMRE,American Redstart
+OVEN,Ovenbird
+NOWA,Northern Waterthrush
+MACW,MacGillivray's Warbler
+COYE,Common Yellowthroat
+WIWA,Wilson's Warbler
+CHSP,Chipping Sparrow
+CCSP,Clay-colored Sparrow
+VESP,Vesper Sparrow
+SAVS,Savannah Sparrow
+LCSP,Le Conte's Sparrow
+FOSP,Fox Sparrow
+SOSP,Song Sparrow
+LISP,Lincoln's Sparrow
+SWSP,Swamp Sparrow
+WTSP,White-throated Sparrow
+WCSP,White-crowned Sparrow
+GCSP,Golden-crowned Sparrow
+DEJU,Dark-eyed Junco
+WETA,Western Tanager
+RBGR,Rose-breasted Grosbeak
+BOBO,Bobolink
+RWBL,Red-winged Blackbird
+WEME,Western Meadowlark
+RUBL,Rusty Blackbird
+BRBL,Brewer's Blackbird
+BHCO,Brown-headed Cowbird
+GCRF,Gray-crowned Rosy-Finch
+PIGR,Pine Grosbeak
+PUFI,Purple Finch
+HOFI,House Finch
+RECR,Red Crossbill
+WWCR,White-winged Crossbill
+PISI,Pine Siskin
+EVGR,Evening Grosbeak
+HOSP,House Sparrow
