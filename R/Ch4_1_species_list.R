@@ -1,10 +1,7 @@
 ###
-### Purpose: create JPRF ARU bird list (threshold = 0.85)
-### 
+### Create JPRF ARU bird list (threshold = 0.85)
 ### Author: Sunny Tseng
 ### Date: 2024-07-19
-### Input: 
-### Output: 
 ###
 
 
@@ -89,30 +86,5 @@ species_list_final <- species_list_additional %>%
   drop_na(code)
 # write_csv(species_list_additional, here("data", "Bird_list",
 #                                         "species_list_final.csv"))
-
-           
-# produce a full dataset for target species -------------------------------
-
-## only keep the validated species, where date/site (effort) that has been 
-## properly functioning. Filter species, year, month, hour of a day. 
-species_list_final <- read_csv(here("data", "Bird_list", "species_list_final.csv"))
-
-int_2020 <- interval(ymd("2020-05-01"), ymd("2020-07-31"))
-int_2021 <- interval(ymd("2021-05-01"), ymd("2021-07-31"))
-int_2022 <- interval(ymd("2022-05-01"), ymd("2022-07-31"))
-
-bird_data_filtered_species_list <- bird_data_cleaned %>%
-  filter(scientific_name %in% species_list_final$scientific_name) %>%
-  filter(date %within% int_2020 |
-           date %within% int_2021 |
-           date %within% int_2022)
-
-save(bird_data_filtered_species_list, file = here("bird_data_filtered_species_list.RData"))
-
-
-
-
-
-
 
 

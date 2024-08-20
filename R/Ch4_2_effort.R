@@ -1,6 +1,5 @@
 ###
 ### Name: Checking the JPRF ARU effort
-### 
 ### Author: Sunny Tseng
 ### Date: 2024 Aug 20
 ###
@@ -14,66 +13,48 @@ library(lubridate)
 library(ggh4x)
 
 
-# check efforts -----------------------------------------------------------
+# functions ---------------------------------------------------------------
 
-# dir <- "E:/Audio/2023_passerine"
-# 
-# effort_info <- tibble()
-# sites <- list.files(dir)
-# for (site in sites) {
-#   
-#   files <- list.files(file.path(dir, site), pattern = 'WAV')
-#   for (file in files) {
-#     
-#     size <- file.info(file.path(dir, site, file))$size
-#     year <- str_sub(file, start = 1, end = 4)
-#     month <- str_sub(file, start = 5, end = 6)
-#     day <- str_sub(file, start = 7, end = 8)
-#     hour <- str_sub(file, start = 10, end = 11)
-#     minute <- str_sub(file, start = 12, end = 13)
-#     
-#     temp <- c(site, year, month, day, hour, minute, size)
-#     effort_info <- rbind(effort_info, temp)
-#   }
-# }
-# names(effort_info) <- c("site", "year", "month", "day", "hour", "minute", "size")
-# write_csv(effort_info, "E:/Audio/2023_passerine_effort.csv")
-
-effort_list <- c("2020_passerine_effort.csv", 
-                 "2021_passerine_effort.csv",
-                 "2022_passerine_effort.csv")
-
-effort_all <- tibble()
-for (file in effort_list) {
-  effort_temp <- read_csv(here("data", "JPRF_aru_effort", file))
-  effort_all <- rbind(effort_all, effort_temp)
+get_effort <- function(dir){
+  effort_info <- tibble()
+  files <- list.files(path = dir, 
+                      pattern = 'WAV', 
+                      recursive = TRUE, 
+                      full.names = TRUE)
+  
+  effort_info <- tibble(file = files) %>%
+    mutate(site = file %>% str_split_i(pattern = "/", 4),
+           datetime = file %>% str_split_i(pattern = "/", 5) %>% ymd_hms(),
+           size = file %>% file.info() %>% pull(size))
+  
+  return(effort_info)
 }
 
-effort_all_1 <- effort_all %>%
-  unite(col = date, year, month, day, remove = FALSE) %>%
-  mutate(date = ymd(date)) %>%
-  mutate(month = as.numeric(month),
-         day = as.numeric(day),
-         hour = as.numeric(hour),
-         minute = as.numeric(minute)) %>%
-  filter(size >= 5760000 & size <= 5760500,
-         year >= 2020 & year <= 2022,
-         month >= 5 & month <= 7,
-         hour %in% c(4, 5, 6),
-         minute %in% seq(0, 60, by = 5)) 
 
-# write_csv(effort_all_1 %>% 
-#             group_nest(site, date) %>%
-#             select(site, date),
-#            here("data", "JPRF_aru_effort", "2020_2022_passerine_effort_filter.csv"))
+# check efforts -----------------------------------------------------------
+
+effort_eval <- c("E:/Audio/2020_passerine", 
+                 "E:/Audio/2021_passerine",
+                 "E:/Audio/2022_passerine") %>%
+  map_df(~ get_effort(dir = .))
+
+save(effort_eval, file = here("effort_eval.RData"))
+
+effort_eval_1 <- effort_eval %>%
+  filter(datetime %within% interval(ymd("2020-05-01"), ymd("2020-07-31")) | 
+           datetime %within% interval(ymd("2021-05-01"), ymd("2021-07-31")) | 
+           datetime %within% interval(ymd("2022-05-01"), ymd("2022-07-31"))) %>%
+  filter(datetime %>% hour() >= 4 & datetime %>% hour() <= 7) %>%
+  filter(size >= 5760000 & size <= 5760500)
 
 
-effort_break <- effort_all_1 %>%
-  group_by(year) %>%
-  summarize(start = min(date),
-            end = max(date))
 
-effort_all_2 <- effort_all_1 %>%
+# visualization of the effort data ----------------------------------------
+
+effort_vis <- effort_eval_1 %>%
+  
+  
+  
   group_nest(date) %>%
   mutate(ARUs = map_dbl(.x = data, .f =~ .x %>% pull(site) %>% n_distinct()),
          year = map_dbl(.x = data, .f =~ .x %>% pull(year) %>% unique()),
