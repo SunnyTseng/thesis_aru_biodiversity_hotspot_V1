@@ -1,21 +1,20 @@
-#######################
 ###
 ### Name: Checking the JPRF ARU effort
 ### 
 ### Author: Sunny Tseng
-### Date: 2023 July 7th
+### Date: 2024 Aug 20
 ###
-########################
 
-### Library
+
+# library -----------------------------------------------------------------
+
 library(tidyverse)
 library(here)
 library(lubridate)
 library(ggh4x)
 
-###
-### Check ARU efforts
-###
+
+# check efforts -----------------------------------------------------------
 
 # dir <- "E:/Audio/2023_passerine"
 # 
