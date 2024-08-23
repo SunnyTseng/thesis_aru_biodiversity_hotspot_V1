@@ -32,21 +32,27 @@ load(here("effort_site_date.RData"))
 ## only keep the validated species, where date/site (effort) that has been 
 ## properly functioning. Filter species, and the date/site that is working
 
-detections_analysis <- bird_data_cleaned %>%
-  mutate(filepath = str_replace_all(filepath, "\\\\", "/")) %>%
+bird_data_cleaned_target <- bird_data_cleaned %>%
   filter(scientific_name %in% bird_list$scientific_name) %>%
-  filter(filepath %in% effort_eval_1$file)
+  inner_join(effort_eval_1, by = join_by(site, date == datetime)) %>%
+  mutate(datetime = date) %>%
+  select(site, datetime, start, end, 
+         scientific_name, common_name, confidence, filepath)
+
+save(bird_data_cleaned_target, file = here("bird_data_cleaned_target.RData"))
+
+## produce a table showing target species information: family, species, 
+## species-specific threshold, detections before filtering, detections after filtering, 
+## how many sites that have observed the species
 
 
-### try different filtering to see whether results are the same
 
 
-bird_data_filtered_species_list <- bird_data_cleaned %>%
-  filter(scientific_name %in% species_list_final$scientific_name) %>%
-  filter(date %within% interval(ymd("2020-05-01"), ymd("2020-07-31")) | 
-           date %within% interval(ymd("2021-05-01"), ymd("2021-07-31")) | 
-           date %within% interval(ymd("2022-05-01"), ymd("2022-07-31"))) %>%
-  filter(date %>% hour() >= 4 & date %>% hour() <= 7)
+
+
+
+
+
 
 
 
