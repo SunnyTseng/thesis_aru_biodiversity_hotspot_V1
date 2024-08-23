@@ -84,7 +84,8 @@ species_list_additional <- read_csv(here("data", "Bird_list",
 ## of 13 species were droped
 species_list_final <- species_list_additional %>%
   drop_na(code)
-# write_csv(species_list_additional, here("data", "Bird_list",
-#                                         "species_list_final.csv"))
+
+write_csv(species_list_final, here("data", "Bird_list",
+                                         "species_list_final.csv"))
 
 

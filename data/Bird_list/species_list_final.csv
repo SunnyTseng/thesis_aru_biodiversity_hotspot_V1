@@ -8,7 +8,6 @@ Empidonax hammondii,Hammond's Flycatcher,HAFL
 Poecile hudsonicus,Boreal Chickadee,BOCH
 Loxia leucoptera,White-winged Crossbill,WWCR
 Troglodytes pacificus,Pacific Wren,PAWR
-Tamiasciurus hudsonicus,Red Squirrel,NA
 Gavia immer,Common Loon,COLO
 Setophaga ruticilla,American Redstart,AMRE
 Parkesia noveboracensis,Northern Waterthrush,NOWA
@@ -22,13 +21,11 @@ Corvus corax,Common Raven,CORA
 Haliaeetus leucocephalus,Bald Eagle,BAEA
 Zonotrichia albicollis,White-throated Sparrow,WTSP
 Spinus pinus,Pine Siskin,PISI
-Oporornis agilis,Connecticut Warbler,NA
 Ixoreus naevius,Varied Thrush,VATH
 Empidonax minimus,Least Flycatcher,LEFL
 Contopus sordidulus,Western Wood-Pewee,WWPE
 Geothlypis tolmiei,MacGillivray's Warbler,MACW
 Piranga ludoviciana,Western Tanager,WETA
-Atlapetes pallidinucha,Pale-naped Brushfinch,NA
 Podiceps auritus,Horned Grebe,HOGR
 Dryocopus pileatus,Pileated Woodpecker,PIWO
 Megaceryle alcyon,Belted Kingfisher,BEKI
@@ -38,9 +35,7 @@ Buteo platypterus,Broad-winged Hawk,BWHA
 Picoides arcticus,Black-backed Woodpecker,BBWO
 Certhia americana,Brown Creeper,BRCR
 Poecile gambeli,Mountain Chickadee,MOCH
-Amblycorypha rotundifolia,Rattler Round-winged Katydid,NA
 Tachycineta bicolor,Tree Swallow,TRSW
-Cardellina canadensis,Canada Warbler,NA
 Empidonax alnorum,Alder Flycatcher,ALFL
 Empidonax difficilis,Pacific-slope Flycatcher,PSFL
 Poecile atricapillus,Black-capped Chickadee,BCCH
@@ -50,7 +45,6 @@ Setophaga coronata,Yellow-rumped Warbler,YRWA
 Selasphorus rufus,Rufous Hummingbird,RUHU
 Passerella iliaca,Fox Sparrow,FOSP
 Gallinago delicata,Wilson's Snipe,WISN
-Vireo solitarius,Blue-headed Vireo,NA
 Dryobates villosus,Hairy Woodpecker,HAWO
 Accipiter gentilis,Northern Goshawk,NOGO
 Tringa melanoleuca,Greater Yellowlegs,GRYE
@@ -65,7 +59,6 @@ Picoides dorsalis,American Three-toed Woodpecker,ATTW
 Chordeiles minor,Common Nighthawk,CONI
 Leiothlypis celata,Orange-crowned Warbler,OCWA
 Junco hyemalis,Dark-eyed Junco,DEJU
-Engine,Engine,NA
 Bubo virginianus,Great Horned Owl,GHOW
 Accipiter striatus,Sharp-shinned Hawk,SSHA
 Pandion haliaetus,Osprey,OSPR
@@ -81,21 +74,15 @@ Aegolius acadicus,Northern Saw-whet Owl,NSWO
 Haemorhous purpureus,Purple Finch,PUFI
 Cardellina pusilla,Wilson's Warbler,WIWA
 Tringa solitaria,Solitary Sandpiper,SOSA
-Artemisiospiza belli,Bell's Sparrow,NA
-Emberiza rustica,Rustic Bunting,NA
 Setophaga striata,Blackpoll Warbler,BKPW
 Podiceps grisegena,Red-necked Grebe,RNGR
 Setophaga townsendi,Townsend's Warbler,TOWA
-Conocephalus brevipennis,Short-winged Meadow Katydid,NA
 Branta canadensis,Canada Goose,CAGO
 Strix nebulosa,Great Gray Owl,GGOW
 Cygnus buccinator,Trumpeter Swan,TRUS
 Aythya collaris,Ring-necked Duck,RNDU
-Lithobates sylvaticus,Wood Frog,NA
 Sphyrapicus varius,Yellow-bellied Sapsucker,YBSA
 Empidonax oberholseri,Dusky Flycatcher,DUFL
-Pseudacris crucifer,Spring Peeper,NA
-Conocephalus fasciatus,Slender Meadow Katydid,NA
 Pinicola enucleator,Pine Grosbeak,PIGR
 Glaucidium gnoma,Northern Pygmy-Owl,NPOW
 Aegolius funereus,Boreal Owl,BOOW
