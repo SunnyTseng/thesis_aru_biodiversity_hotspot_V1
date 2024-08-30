@@ -1,0 +1,133 @@
+filepath,start,end,scientific_name,common_name,confidence,lat,lon,week,overlap,sensitivity,min_conf,species_list,model
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,0,3.0,Conocephalus fasciatus,Slender Meadow Katydid,0.3495,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,6.0,9.0,Bubo virginianus,Great Horned Owl,0.1818,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,18.0,21.0,Conocephalus fasciatus,Slender Meadow Katydid,0.2055,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,18.0,21.0,Amblycorypha alexanderi,Clicker Round-winged Katydid,0.1158,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,60.0,63.0,Strix varia,Barred Owl,0.3200,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,63.0,66.0,Strix varia,Barred Owl,0.3599,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,66.0,69.0,Bubo virginianus,Great Horned Owl,0.1352,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,84.0,87.0,Columba palumbus,Common Wood-Pigeon,0.1406,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,84.0,87.0,Strix uralensis,Ural Owl,0.1189,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,87.0,90.0,Amblycorypha alexanderi,Clicker Round-winged Katydid,0.1281,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,108.0,111.0,Columba palumbus,Common Wood-Pigeon,0.2104,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,132.0,135.0,Columba palumbus,Common Wood-Pigeon,0.2572,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,132.0,135.0,Psiloscops flammeolus,Flammulated Owl,0.2094,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,135.0,138.0,Strix varia,Barred Owl,0.4834,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,135.0,138.0,Columba palumbus,Common Wood-Pigeon,0.2528,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,141.0,144.0,Conocephalus brevipennis,Short-winged Meadow Katydid,0.8091,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,141.0,144.0,Amblycorypha alexanderi,Clicker Round-winged Katydid,0.2135,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,141.0,144.0,Conocephalus fasciatus,Slender Meadow Katydid,0.2075,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,141.0,144.0,Orchelimum agile,Agile Meadow Katydid,0.1947,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,141.0,144.0,Amblycorypha longinicta,Common Virtuoso Katydid,0.1475,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,144.0,147.0,Conocephalus brevipennis,Short-winged Meadow Katydid,0.2191,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,144.0,147.0,Amblycorypha longinicta,Common Virtuoso Katydid,0.1790,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,144.0,147.0,Conocephalus fasciatus,Slender Meadow Katydid,0.1251,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,147.0,150.0,Calypte anna,Anna's Hummingbird,0.3317,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,147.0,150.0,Conocephalus fasciatus,Slender Meadow Katydid,0.2135,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,156.0,159.0,Psiloscops flammeolus,Flammulated Owl,0.1760,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,159.0,162.0,Psiloscops flammeolus,Flammulated Owl,0.4895,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,159.0,162.0,Bubo bubo,Eurasian Eagle-Owl,0.2441,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,180.0,183.0,Strix varia,Barred Owl,0.1654,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,180.0,183.0,Bubo virginianus,Great Horned Owl,0.1133,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,186.0,189.0,Bubo virginianus,Great Horned Owl,0.2456,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,195.0,198.0,Bubo virginianus,Great Horned Owl,0.1473,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,207.0,210.0,Conocephalus fasciatus,Slender Meadow Katydid,0.7437,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,207.0,210.0,Bubo virginianus,Great Horned Owl,0.2286,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,207.0,210.0,Amblycorypha alexanderi,Clicker Round-winged Katydid,0.1380,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,213.0,216.0,Conocephalus fasciatus,Slender Meadow Katydid,0.4453,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,213.0,216.0,Amblycorypha alexanderi,Clicker Round-winged Katydid,0.1679,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,216.0,219.0,Strix varia,Barred Owl,0.8841,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,216.0,219.0,Strix fulvescens,Fulvous Owl,0.2206,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,216.0,219.0,Strix occidentalis,Spotted Owl,0.1112,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,219.0,222.0,Strix varia,Barred Owl,0.7534,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,219.0,222.0,Strix occidentalis,Spotted Owl,0.4110,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,219.0,222.0,Bubo bubo,Eurasian Eagle-Owl,0.1807,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,222.0,225.0,Bubo virginianus,Great Horned Owl,0.1630,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,222.0,225.0,Amblycorypha alexanderi,Clicker Round-winged Katydid,0.1093,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,222.0,225.0,Conocephalus fasciatus,Slender Meadow Katydid,0.1024,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,228.0,231.0,Conocephalus fasciatus,Slender Meadow Katydid,0.4972,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,228.0,231.0,Amblycorypha alexanderi,Clicker Round-winged Katydid,0.1604,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,246.0,249.0,Strix varia,Barred Owl,0.9923,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,249.0,252.0,Strix varia,Barred Owl,0.9771,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,249.0,252.0,Columba palumbus,Common Wood-Pigeon,0.2782,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,255.0,258.0,Bubo virginianus,Great Horned Owl,0.1315,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,261.0,264.0,Columba palumbus,Common Wood-Pigeon,0.4591,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,261.0,264.0,Streptopelia decaocto,Eurasian Collared-Dove,0.1266,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,273.0,276.0,Strix varia,Barred Owl,0.7735,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,276.0,279.0,Strix varia,Barred Owl,0.9155,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,282.0,285.0,Bubo virginianus,Great Horned Owl,0.2832,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,282.0,285.0,Amblycorypha alexanderi,Clicker Round-winged Katydid,0.1125,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,288.0,291.0,Strix varia,Barred Owl,0.1771,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,288.0,291.0,Columba palumbus,Common Wood-Pigeon,0.1066,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,291.0,294.0,Strix varia,Barred Owl,0.9326,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,291.0,294.0,Strix occidentalis,Spotted Owl,0.1703,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,291.0,294.0,Strix fulvescens,Fulvous Owl,0.1571,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,294.0,297.0,Strix varia,Barred Owl,0.9874,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,309.0,312.0,Conocephalus fasciatus,Slender Meadow Katydid,0.1578,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,309.0,312.0,Amblycorypha alexanderi,Clicker Round-winged Katydid,0.1069,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,312.0,315.0,Strix varia,Barred Owl,0.9257,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,312.0,315.0,Columba palumbus,Common Wood-Pigeon,0.2317,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,315.0,318.0,Strix varia,Barred Owl,0.2744,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,315.0,318.0,Bubo bubo,Eurasian Eagle-Owl,0.2661,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,315.0,318.0,Columba palumbus,Common Wood-Pigeon,0.1421,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,318.0,321.0,Bubo virginianus,Great Horned Owl,0.1032,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,333.0,336.0,Strix varia,Barred Owl,0.7774,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,333.0,336.0,Strix occidentalis,Spotted Owl,0.2412,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,336.0,339.0,Strix varia,Barred Owl,0.8632,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,336.0,339.0,Columba palumbus,Common Wood-Pigeon,0.2896,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,351.0,354.0,Zonotrichia leucophrys,White-crowned Sparrow,0.1551,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,357.0,360.0,Bubo virginianus,Great Horned Owl,0.1043,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,360.0,363.0,Strix varia,Barred Owl,0.6032,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,360.0,363.0,Columba palumbus,Common Wood-Pigeon,0.2881,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,363.0,366.0,Conocephalus brevipennis,Short-winged Meadow Katydid,0.5146,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,363.0,366.0,Amblycorypha longinicta,Common Virtuoso Katydid,0.1780,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,366.0,369.0,Psiloscops flammeolus,Flammulated Owl,0.2650,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,366.0,369.0,Bubo virginianus,Great Horned Owl,0.1392,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,384.0,387.0,Strix varia,Barred Owl,0.9519,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,387.0,390.0,Strix varia,Barred Owl,0.5189,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,387.0,390.0,Columba palumbus,Common Wood-Pigeon,0.3249,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,387.0,390.0,Streptopelia decaocto,Eurasian Collared-Dove,0.1816,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,387.0,390.0,Bubo bubo,Eurasian Eagle-Owl,0.1236,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,396.0,399.0,Bubo virginianus,Great Horned Owl,0.1539,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,402.0,405.0,Bubo virginianus,Great Horned Owl,0.1734,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,405.0,408.0,Strix varia,Barred Owl,0.9618,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,405.0,408.0,Strix fulvescens,Fulvous Owl,0.1019,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,408.0,411.0,Strix varia,Barred Owl,0.9844,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,423.0,426.0,Conocephalus fasciatus,Slender Meadow Katydid,0.2717,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,426.0,429.0,Psiloscops flammeolus,Flammulated Owl,0.9200,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,426.0,429.0,Strix occidentalis,Spotted Owl,0.1613,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,429.0,432.0,Strix varia,Barred Owl,0.9921,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,435.0,438.0,Amblycorypha alexanderi,Clicker Round-winged Katydid,0.3743,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,438.0,441.0,Bubo bubo,Eurasian Eagle-Owl,0.1715,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,438.0,441.0,Zenaida macroura,Mourning Dove,0.1440,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,441.0,444.0,Columba palumbus,Common Wood-Pigeon,0.1049,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,444.0,447.0,Bubo virginianus,Great Horned Owl,0.2194,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,456.0,459.0,Strix varia,Barred Owl,0.8906,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,459.0,462.0,Strix varia,Barred Owl,0.9877,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,468.0,471.0,Strix varia,Barred Owl,0.1223,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,471.0,474.0,Strix varia,Barred Owl,0.9182,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,471.0,474.0,Columba palumbus,Common Wood-Pigeon,0.1383,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,483.0,486.0,Strix varia,Barred Owl,0.9774,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,495.0,498.0,Strix varia,Barred Owl,0.5613,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,495.0,498.0,Columba palumbus,Common Wood-Pigeon,0.1422,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,504.0,507.0,Bubo virginianus,Great Horned Owl,0.1173,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,507.0,510.0,Strix varia,Barred Owl,0.9929,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,519.0,522.0,Strix varia,Barred Owl,0.9303,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,522.0,525.0,Columba palumbus,Common Wood-Pigeon,0.1423,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,522.0,525.0,Streptopelia decaocto,Eurasian Collared-Dove,0.1090,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,534.0,537.0,Strix varia,Barred Owl,0.9080,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,537.0,540.0,Strix varia,Barred Owl,0.9893,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,561.0,564.0,Zonotrichia leucophrys,White-crowned Sparrow,0.2735,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,564.0,567.0,Strix varia,Barred Owl,0.9960,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,564.0,567.0,Conocephalus brevipennis,Short-winged Meadow Katydid,0.3413,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,567.0,570.0,Strix varia,Barred Owl,0.9862,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,567.0,570.0,Conocephalus brevipennis,Short-winged Meadow Katydid,0.1823,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,576.0,579.0,Bubo virginianus,Great Horned Owl,0.2271,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,585.0,588.0,Strix varia,Barred Owl,0.6659,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,585.0,588.0,Psiloscops flammeolus,Flammulated Owl,0.1532,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,588.0,591.0,Strix varia,Barred Owl,0.9878,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,591.0,594.0,Conocephalus brevipennis,Short-winged Meadow Katydid,0.5774,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,591.0,594.0,Psiloscops flammeolus,Flammulated Owl,0.2704,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,591.0,594.0,Amblycorypha alexanderi,Clicker Round-winged Katydid,0.1100,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,594.0,597.0,Conocephalus fasciatus,Slender Meadow Katydid,0.1538,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite
+C:\Users\sunny\Desktop\recording_test\14_35_20220410_210000.WAV,594.0,597.0,Amblycorypha longinicta,Common Virtuoso Katydid,0.1124,0.0000,0.0000,-1,0,1.0,0.1,None,BirdNET_GLOBAL_6K_V2.4_Model_FP32.tflite

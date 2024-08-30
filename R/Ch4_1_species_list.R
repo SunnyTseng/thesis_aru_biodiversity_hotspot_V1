@@ -64,14 +64,14 @@ for (i in 521:550) {
 
 # producing the species list from the validated data ----------------------
 
-## basic species list: the intersection of the BirdNET_0.85 and the BC list
+## basic species list: the intersection of the BirdNET_0.8 and the BC list
+## additional species list: all the species detected above 0.975 and validated. 
+## Adding these two lists together. There are 136 species in total.
 species_list_basic <- bird_data_cleaned %>%
   filter(confidence >= 0.8) %>%
   distinct(scientific_name, common_name) %>%
   inner_join(species_list_BC)
 
-## additional species list: all the species detected above 0.975 and validated. 
-## Adding this list to the above. There are 136 species in total.
 species_list_additional <- read_csv(here("data", "Bird_list", 
                                          "species_validation_processed.csv")) %>%
   filter(any(validation == "Y"), .by = scientific_name) %>%
@@ -82,10 +82,27 @@ species_list_additional <- read_csv(here("data", "Bird_list",
 ## All the species that Ken suggested are not in the BC list.
 ## Other than Red-naped Sapsucker, which I am retaining the species. A total
 ## of 13 species were droped
-species_list_final <- species_list_additional %>%
+species_list_filter_1 <- species_list_additional %>%
   drop_na(code)
 
-write_csv(species_list_final, here("data", "Bird_list",
-                                         "species_list_final.csv"))
+## remove the species that don't appear more than one site, or more than 10
+## different days
+species_effort <- bird_data_cleaned %>%
+  group_by(scientific_name, common_name) %>%
+  filter(site %>% n_distinct() > 1) %>%
+  filter(date %>% date() %>% n_distinct() > 1) %>%
+  filter(date %within% interval(ymd("2020-05-01"), ymd("2020-07-31")) |
+           date %within% interval(ymd("2021-05-01"), ymd("2021-07-31")) | 
+           date %within% interval(ymd("2022-05-01"), ymd("2022-07-31"))) %>%
+  distinct(scientific_name, common_name) %>%
+  mutate(effort = "Y")
+
+species_list_filter_2 <- species_list_filter_1 %>%
+  left_join(species_effort) %>%
+  drop_na(effort) %>%
+  select(-effort)
+
+write_csv(species_list_filter_2, 
+          here("data", "Bird_list", "species_list_final.csv"))
 
 
