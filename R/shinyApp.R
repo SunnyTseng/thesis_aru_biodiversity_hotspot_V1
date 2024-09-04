@@ -61,36 +61,43 @@ server <- function(input, output, session) {
     
     ## import dataset
     tryCatch({
-      df <- read_csv(input$detection_list$datapath) %>%
-        datatable(editable = TRUE, escape = FALSE, selection = "none")
+      read_csv(input$detection_list$datapath)
       
     }, error = function(e) {
       # return a safeError if a parsing error occurs
       stop(safeError(e))
     })
   })
+  
+  
+  ## populate the species filter dropdown
+  observe({
+    
+    req(input$detection_list)
+    
+    species_choices <- datatable_main() %>%
+      select(common_name) %>%
+      distinct() %>%
+      arrange(common_name) %>%
+      pull()
 
-  
-  # read this: https://mastering-shiny.org/basic-reactivity.html#reactive-expressions-1
-  # ## populate the species filter dropdown
-  # observe({
-  #   species_choices <- datatable_main() %>%
-  #     select(common_name) %>%
-  #     distinct() %>%
-  #     arrange(common_name) %>%
-  #     pull()
-  #   
-  #   updateSelectInput(session, 
-  #                     "species_filter", 
-  #                     choices = c("", species_choices))
-  # })
-  
-  ## print out the datatable
-  output$editable_table <- renderDataTable({
-    datatable_main()
+    updateSelectInput(session = session,
+                      inputId = "species_filter",
+                      choices = species_choices,
+                      selected = head(species_choices, 1))
   })
   
+  ## print out the datatable
+  output$editable_table <- renderDataTable(
+    datatable_main() %>%
+      datatable(editable = "column", 
+                escape = FALSE, selection = "none")
+  )
 
+  
+  
+#### ChatGPT frame
+  
 # 
 #   # Reactive value to store the data
 #   rv <- reactiveValues(data = initial_data)
