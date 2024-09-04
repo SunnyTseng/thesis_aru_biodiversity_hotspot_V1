@@ -1,11 +1,12 @@
 # library -----------------------------------------------------------------
+
+
 library(tidyverse)
 library(here)
 library(seewave)
 library(tuneR)
 library(shiny)
-
-
+library(purrr)
 # import data -------------------------------------------------------------
 load("bird_data_cleaned_target.RData")
 
@@ -29,9 +30,3 @@ files <- list.files(here("data", "output_test"), full.names = TRUE) %>%
 
 write_csv(files, here("data", "output_test", "output_test_all.csv"))
 
-
-# shiny test --------------------------------------------------------------
-
-# Run the app
-shinyApp(ui = source(here("R", "threshold_validation_ui.R"))$value, 
-         server = source(here("R", "threshold_validation_server.R"))$value)
