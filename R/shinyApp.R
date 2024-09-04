@@ -70,6 +70,7 @@ server <- function(input, output, session) {
     })
   })
   
+  
   # read this: https://mastering-shiny.org/basic-reactivity.html#reactive-expressions-1
   # ## populate the species filter dropdown
   # observe({
