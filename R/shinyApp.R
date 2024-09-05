@@ -2,7 +2,8 @@
 # preset ------------------------------------------------------------------
 
 library(shiny)
-library(dplyr)
+library(bslib)
+library(tidyverse)
 library(DT)
 library(tuneR)
 
@@ -13,12 +14,13 @@ play_audio <- function(filepath, start, end) {
 }
 
 
+
 # ui ----------------------------------------------------------------------
 
 ui <- page_sidebar(
   
   ## add title
-  title = "Bird Audio Validation",
+  title = "Bird Audio Validation for BirdNET Threshold Setting",
   
   sidebar = sidebar(
     ## input: validation_file
@@ -30,12 +32,12 @@ ui <- page_sidebar(
     ## button: save_changes
     actionButton("save_changes", "Save Changes"),
     
-    ## output: species_list_to_do
-    tableOutput("species_list_to_do")
+    ## output: to_do_list
+    tableOutput("to_do_list")
   ),
   
-  ## output: editable_table
-  DTOutput("editable_table")
+  ## output: main_table
+  DTOutput("main_table")
   
 )
 
@@ -44,8 +46,9 @@ ui <- page_sidebar(
 
 server <- function(input, output, session) {
   
+  
   ## read in the file and save it as an reactive object
-  datatable_main <- reactive({
+  data_detections <- reactive({
     ## make sure there is a valid input before reading the file
     req(input$detection_list)
     
@@ -61,22 +64,17 @@ server <- function(input, output, session) {
   
   ## populate the species that still need to be done
   #! make it filter the species that haven't been processed
-  observe({
-    ## make the species list from the imported dataset
-    species_choices <- datatable_main() %>%
+  output$to_do_list <- renderTable(
+    data_detections() %>%
       select(common_name) %>%
       distinct() %>%
-      arrange(common_name) %>%
-      pull()
-    
-    output$species_list_to_do <- renderTable(
-      tibble(species = species_choices)
-    )
-  })
+      select(common_name)
+  )
+  
   
   ## print out the datatable
-  output$editable_table <- renderDataTable(
-    datatable_main() %>% mutate(`Play Audio` = '<button class="play-audio">Play Audio</button>'),
+  output$main_table <- renderDataTable(
+    data_detections() %>% mutate(`Play Audio` = '<button class="play-audio">Play Audio</button>'),
     editable = "column",
     filter = "top",
     escape = FALSE, 
@@ -86,22 +84,22 @@ server <- function(input, output, session) {
   )
   
   
-  ## update the reactive object (datatable_main()) with edited column
+  ## update the reactive object (data_detections()) with edited column
   #! This is not working now!
-  observeEvent(input$editable_table_cell_edit, {
-    datatable_main() <<- editData(datatable_main(), input$editable_table_cell_edit, 'editable_table')
+  observeEvent(input$main_table_cell_edit, {
+    data_detections() <<- editData(data_detections(), input$main_table_cell_edit)
   })
   
   
   ## Event listener for the play-audio button click
-  observeEvent(input$editable_table_click, {
+  observeEvent(input$main_table_cell_clicked, {
     
-    info <- input$editable_table_click
+    info <- input$main_table_cell_clicked
     
-    if (is.null(info$value) || info$col != ncol(filtered_data())) return()  # Check if the Play Audio button was clicked
+    if (is.null(info$value) || info$col != ncol(data_detections())) return()  # Check if the Play Audio button was clicked
     
     # Retrieve the file path and start/end times for the selected row
-    selected_row <- datatable_main()[info$row, ]
+    selected_row <- data_detections()[info$row, ]
     filepath <- selected_row$filepath
     start <- selected_row$start
     end <- selected_row$end
@@ -118,7 +116,7 @@ server <- function(input, output, session) {
   
   ## save changes back to the CSV file
   observeEvent(input$save_changes, {
-    write.csv(datatable_main(), "test.csv", row.names = FALSE)
+    write_csv(data_detections(), "test.csv")
     showNotification("Changes saved successfully.", type = "message")
   })
   

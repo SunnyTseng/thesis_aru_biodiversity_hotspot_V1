@@ -1,0 +1,11 @@
+...1,Admit,Gender,Dept,Freq,Date
+1,Admitted,Male,A,512,2024-09-05T05:31:23Z
+2,Rejected,Male,A,313,2024-09-05T05:31:24Z
+3,Admitted,Female,A,89,2024-09-05T05:31:25Z
+4,Rejected,Female,A,19,2024-09-05T05:31:26Z
+5,Admitted,Male,B,353,2024-09-05T05:31:27Z
+6,Rejected,Male,B,207,2024-09-05T05:31:28Z
+7,Admitted,Female,B,17,2024-09-05T05:31:29Z
+8,Rejected,Female,B,8,2024-09-05T05:31:30Z
+9,Admitted,Male,C,120,2024-09-05T05:31:31Z
+10,Rejected,Male,C,205,2024-09-05T05:31:32Z
