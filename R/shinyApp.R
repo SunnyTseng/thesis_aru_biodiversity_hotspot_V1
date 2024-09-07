@@ -45,21 +45,33 @@ ui <- page_sidebar(
 # server  -----------------------------------------------------------------
 
 server <- function(input, output, session) {
+
+  data_detections <- reactiveVal()
   
-  
-  ## read in the file and save it as an reactive object
-  data_detections <- reactive({
-    ## make sure there is a valid input before reading the file
-    req(input$detection_list)
-    
-    ## import dataset
+  ## read in the file and save it as an reactive object 
+  observeEvent(input$detection_list, {
     tryCatch({
-      read_csv(input$detection_list$datapath)
+      data_detections(read_csv(input$detection_list$datapath))
     }, error = function(e) {
       # return a safeError if a parsing error occurs
       stop(safeError(e))
     })
   })
+  
+  
+  # ## read in the file and save it as an reactive object
+  # data_detections <- reactive({
+  #   ## make sure there is a valid input before reading the file
+  #   req(input$detection_list)
+  #   
+  #   ## import dataset
+  #   tryCatch({
+  #     read_csv(input$detection_list$datapath)
+  #   }, error = function(e) {
+  #     # return a safeError if a parsing error occurs
+  #     stop(safeError(e))
+  #   })
+  # })
   
   
   ## populate the species that still need to be done
@@ -75,7 +87,7 @@ server <- function(input, output, session) {
   ## print out the datatable
   output$main_table <- renderDataTable(
     data_detections() %>% mutate(`Play Audio` = '<button class="play-audio">Play Audio</button>'),
-    editable = "column",
+    editable = TRUE,
     filter = "top",
     escape = FALSE, 
     selection = "none",
@@ -87,7 +99,15 @@ server <- function(input, output, session) {
   ## update the reactive object (data_detections()) with edited column
   #! This is not working now!
   observeEvent(input$main_table_cell_edit, {
-    data_detections() <<- editData(data_detections(), input$main_table_cell_edit)
+     
+    info <- input$main_table_cell_edit
+    
+    updated_data <- isolate(data_detections()) %>%
+      editData(info)
+    
+    data_detections(updated_data)
+    
+    #data_detections() <<- editData(data_detections(), input$main_table_cell_edit)
   })
   
   
