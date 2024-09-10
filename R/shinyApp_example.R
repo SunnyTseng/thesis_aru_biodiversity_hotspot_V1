@@ -42,9 +42,8 @@ ui <- fluidPage(
 server <- function(input, output) {
   
   
-  output$banking.df_data<-renderDataTable(
+  output$banking.df_data <- renderDataTable(
     d1,selection = 'none', editable = TRUE, 
-    rownames = FALSE,
     extensions = 'Buttons',
     
     options = list(
@@ -62,8 +61,16 @@ server <- function(input, output) {
   
   
   observeEvent(input$banking.df_data_cell_edit, {
-    d1[input$banking.df_data_cell_edit$row,input$banking.df_data_cell_edit$col] <<- input$banking.df_data_cell_edit$value
+    
+    info <- input$banking.df_data_cell_edit
+    
+    str(info)
+    
+    d1 <<- editData(d1, input$banking.df_data_cell_edit, 'banking.df_data')
+    
+    #d1[input$banking.df_data_cell_edit$row,input$banking.df_data_cell_edit$col] <<- input$banking.df_data_cell_edit$value
   })
+  
   
   view_fun<-eventReactive(input$viewBtn,{
     if(is.null(input$saveBtn)||input$saveBtn==0)

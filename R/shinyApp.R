@@ -1,16 +1,34 @@
 
 # preset ------------------------------------------------------------------
 
-library(shiny)
+library(shiny) 
 library(bslib)
+library(shinyWidgets) 
+
 library(tidyverse)
 library(DT)
+library(praise)
+
 library(tuneR)
+library(seewave)
 
 # Function to play audio based on filepath, start, and end columns
-play_audio <- function(filepath, start, end) {
-  song <- readWave(filepath, from = start - 3, to = end + 3, units = "seconds")
-  play(song)
+
+play_audio <- function(filepath, start, end) { 
+  song <- readWave(filepath, from = start - 3, to = end + 3, units = "seconds") #
+  play(song, ... = "/play /close") 
+}
+
+
+# Function to view spectrogram
+view_spectrogram <- function(filepath, start, end, flim, contrast, wl) {
+  # Read in the specific segment of the audio file
+  song <- readWave(filepath, from = start - 1, to = end + 1, units = "seconds")
+  
+  # Plot the spectrogram
+  spectro(song, f = song@samp.rate, flim = flim, ovlp = 50,
+          collevels = seq(-40, 0, 1), wl = wl, contrast = contrast,
+          scale = FALSE)
 }
 
 
@@ -23,21 +41,39 @@ ui <- page_sidebar(
   title = "Bird Audio Validation for BirdNET Threshold Setting",
   
   sidebar = sidebar(
-    ## input: validation_file
-    fileInput("detection_list", "Choose the detection file", multiple = FALSE, 
-              accept = c("text/csv", 
-                         "text/comma-separated-values,text/plain",
-                         ".csv")),
+    card(
+      ## input: validation_file
+      fileInput("detection_list", "Validation file", multiple = FALSE, 
+                accept = c("text/csv", 
+                           "text/comma-separated-values,text/plain",
+                           ".csv"),
+                width = "100%"),
+      
+      ## output: to_do_list
+      textOutput("target_species")
+      ),
     
-    ## button: save_changes
-    actionButton("save_changes", "Save Changes"),
+    card(
+      numericRangeInput("flim", "Frequency range:",
+                        min = 1, max = 10, value = c(0, 6)),
+      numericInput("contrast", "Contrast:", value = 2),
+      numericInput("wl", "Window length:", value = 512),
+    ),
     
-    ## output: to_do_list
-    tableOutput("to_do_list")
+    card(
+      ## button: encouragement
+      actionButton("praise_me", "Praise me"), 
+      
+      ## button: save_changes
+      actionButton("save_changes", "Save changes"),
+    )
+
+    
   ),
   
   ## output: main_table
-  DTOutput("main_table")
+  DTOutput("main_table"),
+  plotOutput("spectrogram")
   
 )
 
@@ -46,99 +82,123 @@ ui <- page_sidebar(
 
 server <- function(input, output, session) {
 
-  data_detections <- reactiveVal()
+  rv <- reactiveValues()
   
-  ## read in the file and save it as an reactive object 
+  ## read in the file and save it as an reactive object
   observeEvent(input$detection_list, {
     tryCatch({
-      data_detections(read_csv(input$detection_list$datapath))
+      rv$data_display <- read_csv(input$detection_list$datapath)
     }, error = function(e) {
       # return a safeError if a parsing error occurs
       stop(safeError(e))
     })
   })
   
-  
-  # ## read in the file and save it as an reactive object
-  # data_detections <- reactive({
-  #   ## make sure there is a valid input before reading the file
-  #   req(input$detection_list)
-  #   
-  #   ## import dataset
-  #   tryCatch({
-  #     read_csv(input$detection_list$datapath)
-  #   }, error = function(e) {
-  #     # return a safeError if a parsing error occurs
-  #     stop(safeError(e))
-  #   })
-  # })
-  
-  
-  ## populate the species that still need to be done
-  #! make it filter the species that haven't been processed
-  output$to_do_list <- renderTable(
-    data_detections() %>%
-      select(common_name) %>%
-      distinct() %>%
-      select(common_name)
-  )
-  
-  
-  ## print out the datatable
-  output$main_table <- renderDataTable(
-    data_detections() %>% mutate(`Play Audio` = '<button class="play-audio">Play Audio</button>'),
-    editable = TRUE,
-    filter = "top",
-    escape = FALSE, 
-    selection = "none",
-    rownames = FALSE,
-    options = list(pageLength = 8)
-  )
-  
-  
-  ## update the reactive object (data_detections()) with edited column
-  #! This is not working now!
-  observeEvent(input$main_table_cell_edit, {
-     
-    info <- input$main_table_cell_edit
+  ## print out the main_table
+  output$main_table <- renderDT({
+    # Ensure file has been uploaded before trying to render the table
+    req(rv$data_display)
     
-    updated_data <- isolate(data_detections()) %>%
-      editData(info)
-    
-    data_detections(updated_data)
-    
-    #data_detections() <<- editData(data_detections(), input$main_table_cell_edit)
+    # Render the data table with a play button
+    rv$data_display %>%
+      mutate(`Spectrogram` = '<button class="spectrogram">Spectrogram</button>',
+             `Play Audio` = '<button class="play-audio">Play Audio</button>') %>%
+      datatable(
+        editable = "cell",
+        escape = FALSE,
+        selection = "none",
+        options = list(pageLength = 8)
+      )
   })
   
   
-  ## Event listener for the play-audio button click
+  ## print out the target_species
+  output$target_species <- renderText({
+    # Ensure file has been uploaded before trying to render the table
+    req(rv$data_display)
+    
+    # find out the target species
+    paste0("Target: ", rv$data_display %>%
+             pull(common_name) %>%
+             unique())
+  })
+  
+  
+  ## praise the user when the praise_me button is clicked
+  observeEvent(input$praise_me, {
+    showNotification(praise(), type = "message")
+  })
+  
+  
+  ## save changes back to the CSV file
+  observeEvent(input$save_changes, {
+    write_csv(rv$data_display, "test.csv")
+    showNotification("Changes saved successfully.", type = "message")
+  })
+  
+  
+  ## update the reactive object when data is edited
+  observeEvent(input$main_table_cell_edit, {
+    
+    info <- input$main_table_cell_edit
+    
+    showNotification(paste0("You made a value change with ", info$value), type = "message")
+    
+    rv$data_display <<- editData(rv$data_display, info, 'main_table')
+  })
+  
+  
+  
+  ## show spectrogram when the spectrogram button click
   observeEvent(input$main_table_cell_clicked, {
     
     info <- input$main_table_cell_clicked
     
-    if (is.null(info$value) || info$col != ncol(data_detections())) return()  # Check if the Play Audio button was clicked
+    if (is.null(info$value) || info$col != (ncol(rv$data_display) + 1)) return()  # Check if the Play Audio button was clicked
     
     # Retrieve the file path and start/end times for the selected row
-    selected_row <- data_detections()[info$row, ]
+    selected_row <- rv$data_display[info$row, ]
     filepath <- selected_row$filepath
     start <- selected_row$start
     end <- selected_row$end
     
-    # Play the audio file
+    # show spectrogram
     if (file.exists(filepath)) {
-      song <- readWave(filepath, from = start - 3, to = end + 3, units = "seconds")
-      play(song, ... = "/play /close")
+      output$spectrogram <- renderPlot({
+        
+        view_spectrogram(filepath = filepath, start = start, end = end, 
+                         flim = input$flim,
+                         contrast = input$contrast,
+                         wl = input$wl)
+        
+      })
     } else {
       showNotification("Audio file not found.", type = "error")
     }
   })
   
   
-  ## save changes back to the CSV file
-  observeEvent(input$save_changes, {
-    write_csv(data_detections(), "test.csv")
-    showNotification("Changes saved successfully.", type = "message")
+  ## play audio when the play-audio button click
+  observeEvent(input$main_table_cell_clicked, {
+    
+    info <- input$main_table_cell_clicked
+    
+    if (is.null(info$value) || info$col != (ncol(rv$data_display) + 2)) return()  # Check if the Play Audio button was clicked
+    
+    # Retrieve the file path and start/end times for the selected row
+    selected_row <- rv$data_display[info$row, ]
+    filepath <- selected_row$filepath
+    start <- selected_row$start
+    end <- selected_row$end
+    
+    # Play the audio file
+    if (file.exists(filepath)) {
+      play_audio(filepath = filepath, start = start, end = end)
+    } else {
+      showNotification("Audio file not found.", type = "error")
+    }
   })
+
   
   
   

@@ -28,5 +28,10 @@ write_csv(threshold_all, here("data", "threshold_validation", "threshold_validat
 files <- list.files(here("data", "output_test"), full.names = TRUE) %>%
   map_df(~ read_csv(file = .)) 
 
-write_csv(files, here("data", "output_test", "output_test_all.csv"))
+short_file <- files %>%
+  filter(common_name == "Barred Owl") %>%
+  select(filepath, start, end, scientific_name, common_name, confidence) %>%
+  mutate(validation = "ENTER_VALUE_HERE")
+
+write_csv(short_file, here("data", "output_test", "Barred_Owl.csv"))
 
