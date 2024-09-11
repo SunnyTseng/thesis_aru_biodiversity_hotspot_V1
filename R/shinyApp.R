@@ -12,8 +12,8 @@ library(praise)
 library(tuneR)
 library(seewave)
 
-# Function to play audio based on filepath, start, and end columns
 
+# Function to play audio based on filepath, start, and end columns
 play_audio <- function(filepath, start, end) { 
   song <- readWave(filepath, from = start - 3, to = end + 3, units = "seconds") #
   play(song, ... = "/play /close") 
@@ -36,9 +36,10 @@ view_spectrogram <- function(filepath, start, end, flim, wl) {
 
 ui <- page_sidebar(
   
-  ## add title
+  # add title
   title = "Bird Audio Validation for BirdNET Threshold Setting",
   
+  # add sidebar
   sidebar = sidebar(
     card("Validation File", 
          ## input: validation_file
@@ -47,8 +48,7 @@ ui <- page_sidebar(
                               "text/comma-separated-values,text/plain",
                               ".csv"),
                    width = "100%"),
-         
-         ## output: to_do_list
+         ## output: target_species
          textOutput("target_species")
     ),
     
@@ -71,22 +71,24 @@ ui <- page_sidebar(
     
   ),
   
-  ## output: main_table
+  # add main panel
   card(
+    ## output: main_table
     DTOutput("main_table")
   ),
   card(
+    ## output: spectrogram
     plotOutput("spectrogram")
   )
 )
 
 
+
 # server  -----------------------------------------------------------------
 
 server <- function(input, output, session) {
-  
-  
-  # save the reactive object for the main use -------------------------------
+
+  # reactive values --------------------------------------------------------
   
   # Create a reactiveValues object to store the data
   rv <- reactiveValues()
@@ -101,14 +103,13 @@ server <- function(input, output, session) {
   })
   
   
-  
   # making all the elements on the UI ---------------------------------------
-  
+
   # render the main table
   output$main_table <- renderDT({
     # Ensure file has been uploaded before trying to render the table
     req(rv$data_display)
-    
+
     # Render the data table with a play button
     rv$data_display %>%
       mutate(`Spectrogram` = '<button class="spectrogram">Spectrogram</button>',
@@ -121,56 +122,56 @@ server <- function(input, output, session) {
                                                 list(targets = ncol(rv$data_display) + 2, orderable = FALSE)))
       )
   })
-  
-  
+
+
   # print out target species
   output$target_species <- renderText({
     # Ensure file has been uploaded before trying to render the table
     req(rv$data_display)
-    
+
     # find out the target species
     paste0("Target: ", rv$data_display %>%
              pull(common_name) %>%
              unique())
   })
-  
-  
-  
+
+
+
   # progress bar
   output$progress_bar <- renderUI({
     # Ensure file has been uploaded before trying to render the table
     req(rv$data_display)
-    
+
     # Calculate the percentage of T/F values in the data
     percentage <- rv$data_display %>%
       select(validation) %>%
       map_df(~ sum(.x %in% c("T", "F")) / length(.x)) %>%
       pull() %>%
       mean() * 100
-    
+
     # Create a progress bar
     progressBar(title = "Progress bar:", id = "bar_id", value = percentage)
   })
-  
-  
-  
+
+
+
   # define what will happen for actions -------------------------------------
-  
+
   ## praise the user when the praise_me button is clicked
   observeEvent(input$praise_me, {
     showNotification(praise(), type = "message")
   })
-  
-  
+
+
   ## download the data when the download_data button is clicked
   output$download_data <- downloadHandler(
-    
+
     filename = function() {
       paste0(rv$data_display %>%
                pull(common_name) %>%
                unique(), "_validated.csv")
     },
-    
+
     content = function(file) {
       write_csv(rv$data_display, file)
       showNotification("Download successfully.", type = "message")
@@ -193,22 +194,22 @@ server <- function(input, output, session) {
   
   ## show spectrogram when the spectrogram button click
   observeEvent(input$main_table_cell_clicked, {
-    
+
     info <- input$main_table_cell_clicked
-    
+
     # Check if the click was on the spectrogram button
     if (is.null(info$value) || info$col != (ncol(rv$data_display) + 1)) return()
-    
+
     # Retrieve the file path and start/end times for the selected row
     selected_row <- rv$data_display[info$row, ]
     filepath <- selected_row$filepath
     start <- selected_row$start
     end <- selected_row$end
-    
+
     # show spectrogram
     if (file.exists(filepath)) {
       output$spectrogram <- renderPlot({
-        
+
         view_spectrogram(filepath = filepath, start = start, end = end,
                          flim = input$flim,
                          wl = input$wl)
@@ -217,22 +218,22 @@ server <- function(input, output, session) {
       showNotification("Audio file not found.", type = "error")
     }
   })
-  
-  
+
+
   ## play audio when the play-audio button click
   observeEvent(input$main_table_cell_clicked, {
-    
+
     info <- input$main_table_cell_clicked
-    
+
     # Check if the click was on the play-audio button
     if (is.null(info$value) || info$col != (ncol(rv$data_display) + 2)) return()
-    
+
     # Retrieve the file path and start/end times for the selected row
     selected_row <- rv$data_display[info$row, ]
     filepath <- selected_row$filepath
     start <- selected_row$start
     end <- selected_row$end
-    
+
     # Play the audio file
     if (file.exists(filepath)) {
       play_audio(filepath = filepath, start = start, end = end)
