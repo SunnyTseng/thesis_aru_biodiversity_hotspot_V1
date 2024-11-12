@@ -17,11 +17,11 @@ library(here)
 # load data ---------------------------------------------------------------
 
 ## species list in BC atlas
-species_list_BC <- read_csv(here("data", "Bird_list", "species_bc_breeding_bird_atlas.csv")) %>%
+species_list_BC <- read_csv(here("data", "bird_list", "species_bc_breeding_bird_atlas.csv")) %>%
   mutate(common_name = if_else(common_name == "Gray Jay", "Canada Jay", common_name))
 
 # bird detections from 3 years of data
-# bird_data <- list.files(here("data", "Audio_output_combined"),
+# bird_data <- list.files(here("data", "audio_output_combined"),
 #                         pattern = ".csv$", recursive = TRUE,
 #                         full.names = TRUE) %>%
 #   map_df(~ read_csv(file = .)) 
@@ -42,10 +42,10 @@ load(here("bird_data_cleaned.RData"))
 bird_data_0.975 <- bird_data_cleaned %>%
    filter(confidence >= 0.975) %>% # 155 species
    slice_max(order_by = confidence, n = 5, by = scientific_name, with_ties = FALSE)
-# write_csv(bird_data_0.975, here("data", "Bird_list", "species_validation_raw.csv"))
+# write_csv(bird_data_0.975, here("data", "bird_list", "species_validation_raw.csv"))
 
 ## listen to the target recordings
-bird_data_0.975 <- read_csv(here("data", "Bird_list", "species_validation_raw.csv"))
+bird_data_0.975 <- read_csv(here("data", "bird_list", "species_validation_raw.csv"))
 for (i in 521:550) {
 
   print(paste0("This is ", bird_data_0.975$common_name[i],
@@ -72,7 +72,7 @@ species_list_basic <- bird_data_cleaned %>%
   distinct(scientific_name, common_name) %>%
   inner_join(species_list_BC)
 
-species_list_additional <- read_csv(here("data", "Bird_list", 
+species_list_additional <- read_csv(here("data", "bird_list", 
                                          "species_validation_processed.csv")) %>%
   filter(any(validation == "Y"), .by = scientific_name) %>%
   distinct(scientific_name, common_name) %>%
@@ -103,6 +103,6 @@ species_list_filter_2 <- species_list_filter_1 %>%
   select(-effort)
 
 write_csv(species_list_filter_2, 
-          here("data", "Bird_list", "species_list_final.csv"))
+          here("data", "bird_list", "species_list_final.csv"))
 
 

@@ -54,7 +54,7 @@ effort_eval_1 <- effort_eval %>%
   filter(datetime %>% hour() >= 4 & datetime %>% hour() <= 7) %>%
   filter(size >= 5760000 & size <= 5760500)
 
-save(effort_eval_1, file = here("effort_site_date.RData"))
+# save(effort_eval_1, file = here("effort_site_date.RData"))
 
 
 # no. of active ARUs for each of the date ---------------------------------
