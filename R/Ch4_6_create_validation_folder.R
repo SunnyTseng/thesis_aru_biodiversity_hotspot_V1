@@ -4,17 +4,19 @@
 library(tidyverse)
 library(here)
 
+library(tuneR)
+library(seewave)
 
 # import data -------------------------------------------------------------
 
-load(here("data", "BirdNET_detections", "bird_data_cleaned_target.RData"))
+load(here("data", "BirdNET_detections", "bird_data_cleaned_target.rda"))
 
 # function for moving recordings to a given folder
 move_recording <- function(id, filepath, start, end, 
-                           buffer = 3, path = species_folder, ...){
+                           buffer = 3, path = species_folder, drive = "H:", ...){
   
   # load audio file
-  audio <- readWave(filepath)
+  audio <- readWave(str_replace(filepath, "E:", drive))
   # Trim the audio using start and end times in seconds
   trimmed_audio <- cutw(audio, f = audio@samp.rate, 
                         from = max(0, start - buffer), 
@@ -33,13 +35,11 @@ set.seed(2024)
 
 species <- bird_data_cleaned_target %>%
   pull(common_name) %>% 
-  unique()
-
-#for (target_species in species) {
+  unique() 
 
 
-target_species <- species[1]
-
+# loop through species 
+for (target_species in species) {
   # manage species folder
   species_folder <- here("data", "validation_recordings", target_species)
   
@@ -50,14 +50,22 @@ target_species <- species[1]
   # validation table
   table <- bird_data_cleaned_target %>%
     filter(common_name == target_species) %>%
-    mutate(category = cut(confidence, breaks = seq(0.1, 0.95, by = 0.05))) %>%
+    mutate(category = cut(confidence, breaks = seq(0.1, 1, by = 0.05), right = FALSE)) %>%
     slice_sample(n = 20, by = category) 
+  
+  # select 25 out of each bin if there are not enough sample size
+  if (nrow(table) < 180) {
+    table <- bird_data_cleaned_target %>%
+      filter(common_name == target_species) %>%
+      mutate(category = cut(confidence, breaks = seq(0.1, 1, by = 0.05), right = FALSE)) %>%
+      slice_sample(n = 50, by = category) 
+  }
   
   write_csv(table, file.path(species_folder, paste0(target_species, "_validation.csv")))
   
   # move recordings
   pmap(table, move_recording)          
-#}
+}
 
 
 
