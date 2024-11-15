@@ -53,14 +53,6 @@ for (target_species in species) {
     mutate(category = cut(confidence, breaks = seq(0.1, 1, by = 0.05), right = FALSE)) %>%
     slice_sample(n = 20, by = category) 
   
-  # select 25 out of each bin if there are not enough sample size
-  if (nrow(table) < 180) {
-    table <- bird_data_cleaned_target %>%
-      filter(common_name == target_species) %>%
-      mutate(category = cut(confidence, breaks = seq(0.1, 1, by = 0.05), right = FALSE)) %>%
-      slice_sample(n = 50, by = category) 
-  }
-  
   write_csv(table, file.path(species_folder, paste0(target_species, "_validation.csv")))
   
   # move recordings
