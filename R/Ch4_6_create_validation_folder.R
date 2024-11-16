@@ -41,7 +41,7 @@ species <- bird_data_cleaned_target %>%
 # loop through species 
 for (target_species in species) {
   # manage species folder
-  species_folder <- here("data", "validation_recordings", target_species)
+  species_folder <- here("data", "validation_recordings_practice", target_species)
   
   if (!dir.exists(species_folder)) {
     dir.create(species_folder, recursive = TRUE)
