@@ -9,8 +9,7 @@ library(shiny)
 library(purrr)
 # import data -------------------------------------------------------------
 
-load("bird_data_cleaned_target.RData")
-
+load(here("data", "BirdNET_detections", "bird_data_cleaned_target.rda"))
 
 
 # listen, watch, validate -------------------------------------------------
