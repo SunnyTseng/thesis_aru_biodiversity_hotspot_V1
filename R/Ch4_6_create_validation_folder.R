@@ -60,6 +60,21 @@ for (target_species in species) {
 }
 
 
+# run the shinyApp for validation -----------------------------------------
+
+library(shiny) 
+library(bslib)
+library(shinyWidgets) 
+library(shinyFiles)
+
+library(tidyverse)
+library(DT)
+library(praise)
+
+library(tuneR)
+library(seewave)
+
+shiny::runGitHub("Birds-Canada-ARU-2024", "SunnyTseng", subdir = "R")
 
 
 
