@@ -24,12 +24,16 @@ effort <- effort_eval_1 %>%
 
 
 # covariate data
-load()
+cov_lidar <- readxl::read_xlsx(here("data", "JPRF_lidar_2015", "JPRF_veg_Lidar_2015_summarized.xlsx"), sheet = "100") %>%
+  rename(site = Site) %>%
+  mutate(site = str_replace(site, "^N(\\d+)", "N_\\1"))
+  
 
 
-# test for OSFL -----------------------------------------------------------
 
-OSFL_occ <- bird_data_cleaned_target %>%
+# OSFL occurrence data ----------------------------------------------------
+
+OSFL_occ_0 <- bird_data_cleaned_target %>%
   
   # retain qualified detections
   filter(common_name == "Olive-sided Flycatcher") %>%
@@ -46,32 +50,53 @@ OSFL_occ <- bird_data_cleaned_target %>%
   unite(col = "year_week", year, week) %>%
   pivot_wider(id_cols = site, 
               names_from = year_week, 
-              values_from = detections)
+              values_from = detections) 
+
+# transform to matrix
+OSFL_occ <- OSFL_occ_0 %>%
+  column_to_rownames(var = "site") %>%
+  as.matrix() 
 
 
 
 # occurrence covariates ---------------------------------------------------
 
+OSFL_cov <- cov_lidar %>%
+  right_join(OSFL_occ_0) %>%
+  select(cc10) 
 
+
+
+# detection covariates ----------------------------------------------------
+
+OSFL_det <- list(
+  woy <- OSFL_occ_0 %>%
+    names() %>%
+    str_split_i(pattern = "_", 2) %>%
+    .[!is.na(.)]
+)
+  
 
 
 # spOccupancy modelling ---------------------------------------------------
 
-oven.occ.formula <- ~ scale(Elevation) + I(scale(Elevation)^2)
-oven.det.formula <- ~ scale(day) + scale(tod) + I(scale(day)^2)
-# Check out the format of ovenHBEF
-str(ovenHBEF)
+# data
+OSFL_data <- list(y = OSFL_occ,
+                  occ.covs = OSFL_cov,
+                  det.covs = OSFL_det)
+
+str(OSFL_data)
+
+# formula
+OSFL_occ_formula <- ~ scale(cc10)
+OSFL_det_formula <- ~ woy
 
 
+OSFL_inits <- list(alpha = 0, 
+                   beta = 0, 
+                   z = apply(OSFL_data$y, 1, max, na.rm = TRUE))
 
-# Format with explicit specification of inits for alpha and beta
-# with four detection parameters and three occurrence parameters 
-# (including the intercept).
-oven.inits <- list(alpha = c(0, 0, 0, 0), 
-                   beta = c(0, 0, 0), 
-                   z = apply(ovenHBEF$y, 1, max, na.rm = TRUE))
-
-oven.priors <- list(alpha.normal = list(mean = 0, var = 2.72), 
+OSFL_priors <- list(alpha.normal = list(mean = 0, var = 2.72), 
                     beta.normal = list(mean = 0, var = 2.72))
 
 n.samples <- 5000
@@ -79,12 +104,13 @@ n.burn <- 3000
 n.thin <- 2
 n.chains <- 3
 
-out <- PGOcc(occ.formula = oven.occ.formula, 
-             det.formula = oven.det.formula, 
-             data = ovenHBEF, 
-             inits = oven.inits, 
+# model
+out <- PGOcc(occ.formula = OSFL_occ_formula, 
+             det.formula = OSFL_det_formula, 
+             data = OSFL_data, 
+             inits = OSFL_inits, 
              n.samples = n.samples, 
-             priors = oven.priors, 
+             priors = OSFL_priors, 
              n.omp.threads = 1, 
              verbose = TRUE, 
              n.report = 1000, 
@@ -94,11 +120,18 @@ out <- PGOcc(occ.formula = oven.occ.formula,
 
 
 
+# Goodness of fit ---------------------------------------------------------
+
+summary(out)
+
+plot(out, 'beta', density = FALSE) # Occupancy parameters.
+
+plot(out, 'alpha', density = FALSE) # Detection parameters.
 
 
+ppc.out <- ppcOcc(out, fit.stat = 'freeman-tukey', group = 1)
+summary(ppc.out)
 
-
-  
 
 
 
