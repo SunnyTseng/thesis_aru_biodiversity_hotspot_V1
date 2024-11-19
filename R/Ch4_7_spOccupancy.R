@@ -53,6 +53,10 @@ OSFL_occ <- bird_data_cleaned_target %>%
 # occurrence covariates ---------------------------------------------------
 
 
+
+
+# spOccupancy modelling ---------------------------------------------------
+
 oven.occ.formula <- ~ scale(Elevation) + I(scale(Elevation)^2)
 oven.det.formula <- ~ scale(day) + scale(tod) + I(scale(day)^2)
 # Check out the format of ovenHBEF
