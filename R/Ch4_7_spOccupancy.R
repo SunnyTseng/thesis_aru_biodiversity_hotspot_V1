@@ -4,6 +4,7 @@
 
 library(tidyverse)
 library(here)
+library(spOccupancy)
 
 
 
@@ -23,6 +24,7 @@ effort <- effort_eval_1 %>%
 
 
 # covariate data
+load()
 
 
 # test for OSFL -----------------------------------------------------------
@@ -51,6 +53,40 @@ OSFL_occ <- bird_data_cleaned_target %>%
 # occurrence covariates ---------------------------------------------------
 
 
+oven.occ.formula <- ~ scale(Elevation) + I(scale(Elevation)^2)
+oven.det.formula <- ~ scale(day) + scale(tod) + I(scale(day)^2)
+# Check out the format of ovenHBEF
+str(ovenHBEF)
+
+
+
+# Format with explicit specification of inits for alpha and beta
+# with four detection parameters and three occurrence parameters 
+# (including the intercept).
+oven.inits <- list(alpha = c(0, 0, 0, 0), 
+                   beta = c(0, 0, 0), 
+                   z = apply(ovenHBEF$y, 1, max, na.rm = TRUE))
+
+oven.priors <- list(alpha.normal = list(mean = 0, var = 2.72), 
+                    beta.normal = list(mean = 0, var = 2.72))
+
+n.samples <- 5000
+n.burn <- 3000
+n.thin <- 2
+n.chains <- 3
+
+out <- PGOcc(occ.formula = oven.occ.formula, 
+             det.formula = oven.det.formula, 
+             data = ovenHBEF, 
+             inits = oven.inits, 
+             n.samples = n.samples, 
+             priors = oven.priors, 
+             n.omp.threads = 1, 
+             verbose = TRUE, 
+             n.report = 1000, 
+             n.burn = n.burn, 
+             n.thin = n.thin, 
+             n.chains = n.chains)
 
 
 
