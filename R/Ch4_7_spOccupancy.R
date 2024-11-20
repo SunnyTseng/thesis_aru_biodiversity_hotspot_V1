@@ -4,7 +4,11 @@
 
 library(tidyverse)
 library(here)
+
 library(spOccupancy)
+library(terra)
+library(stars)
+
 
 
 
@@ -24,10 +28,20 @@ effort <- effort_eval_1 %>%
 
 
 # covariate data
-cov_lidar <- readxl::read_xlsx(here("data", "JPRF_lidar_2015", "JPRF_veg_Lidar_2015_summarized.xlsx"), sheet = "100") %>%
+cov_lidar <- readxl::read_xlsx(here("data", "JPRF_lidar_2015", 
+                                    "JPRF_veg_Lidar_2015_summarized.xlsx"), 
+                               sheet = "100") %>%
   rename(site = Site) %>%
   mutate(site = str_replace(site, "^N(\\d+)", "N_\\1"))
   
+
+# covariate data for prediction
+cov_prediction <- rast(here("data", "JPRF_lidar_2015", 
+                            "JPRF_veg_Lidar_2015_raw", "Crown_Closure_above_10m_zero1.tif")) %>%
+  aggregate(fact = 15, fun = mean) %>%
+  as.data.frame(xy = TRUE) %>%
+  as_tibble() %>%
+  rename(cc10 = Crown_Closure_above_10m_zero1)
 
 
 
@@ -129,8 +143,44 @@ plot(out, 'beta', density = FALSE) # Occupancy parameters.
 plot(out, 'alpha', density = FALSE) # Detection parameters.
 
 
-ppc.out <- ppcOcc(out, fit.stat = 'freeman-tukey', group = 1)
-summary(ppc.out)
+
+
+# prediction --------------------------------------------------------------
+
+X.0 <- cbind(1, scale(cov_prediction$cc10))
+out.pred <- predict(out, X.0)
+
+
+plot.dat <- data.frame(x = cov_prediction$x, 
+                       y = cov_prediction$y, 
+                       mean.psi = apply(out.pred$psi.0.samples, 2, mean), 
+                       sd.psi = apply(out.pred$psi.0.samples, 2, sd), 
+                       stringsAsFactors = FALSE)
+# Make a species distribution map showing the point estimates,
+# or predictions (posterior means)
+
+dat.stars <- plot.dat %>%
+  filter(mean.psi > 0.2) %>%
+  st_as_stars(dims = c('x', 'y'))
+
+
+
+ggplot() + 
+  geom_stars(data = dat.stars, aes(x = x, y = y, 
+                                   fill = mean.psi)) +
+  #scale_fill_viridis_c(option = "plasma", na.value = "transparent") +
+  scale_fill_gradient(low = "white", high = "lightsteelblue4", na.value = "transparent") +
+  labs(x = 'Easting', y = 'Northing', fill = '', 
+       title = 'Mean OSFL occurrence probability') +
+  theme_bw()
+
+# plot the cov_prediction
+ggplot() + 
+  geom_raster(data = cov_prediction, aes(x = x, y = y, fill = cc10)) +
+  scale_fill_viridis_c(option = "plasma") +
+  labs(x = 'Easting', y = 'Northing', fill = 'Crown Closure above 10m (%)', 
+       title = 'Crown Closure above 10m') +
+  theme_bw()
 
 
 
