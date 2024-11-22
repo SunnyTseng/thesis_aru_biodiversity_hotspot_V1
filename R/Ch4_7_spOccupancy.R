@@ -134,6 +134,7 @@ out <- PGOcc(occ.formula = OSFL_occ_formula,
 
 
 
+
 # Goodness of fit ---------------------------------------------------------
 
 summary(out)
