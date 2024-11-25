@@ -41,7 +41,7 @@ species <- bird_data_cleaned_target %>%
 # loop through species 
 for (target_species in species) {
   # manage species folder
-  species_folder <- here("data", "validation_recordings_practice", target_species)
+  species_folder <- here("data", "validation_recordings_180", target_species)
   
   if (!dir.exists(species_folder)) {
     dir.create(species_folder, recursive = TRUE)
@@ -51,7 +51,7 @@ for (target_species in species) {
   table <- bird_data_cleaned_target %>%
     filter(common_name == target_species) %>%
     mutate(category = cut(confidence, breaks = seq(0.1, 1, by = 0.05), right = FALSE)) %>%
-    slice_sample(n = 20, by = category) 
+    slice_sample(n = 10, by = category) 
   
   write_csv(table, file.path(species_folder, paste0(target_species, "_validation.csv")))
   
