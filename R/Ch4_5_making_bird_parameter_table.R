@@ -6,6 +6,12 @@ library(here)
 library(gt)
 
 
+
+# load data ---------------------------------------------------------------
+
+
+
+
 # bird parameters table ---------------------------------------------------
 
 birdnet_argument <- c("i", "o", "lat", "lon", "week", "slist", "sensitivity",
