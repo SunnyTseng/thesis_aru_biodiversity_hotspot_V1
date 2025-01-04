@@ -9,6 +9,14 @@ library(gt)
 
 # load data ---------------------------------------------------------------
 
+# bird list in JPRF
+species_list_final <- read_csv(here("data", "bird_list", "species_list_final.csv"))
+
+# bird list from eBird to get the order and family
+clement <- read_csv(here("data", "bird_list", "Clements-v2024-October-2024-rev.csv"))
+
+# bird detections to get the detection number
+load(here("data", "BirdNET_detections", "bird_data_cleaned_target.rda"))
 
 
 
@@ -42,3 +50,49 @@ birdnet_table <- data.frame(Argument = birdnet_argument,
               heading.subtitle.font.size = 12)
 
 gtsave(data = birdnet_table, filename = here("docs", "tables", "birdnet_parameters.rtf"))
+
+
+
+# bird species table ------------------------------------------------------
+
+species_table <- bird_data_cleaned_target %>%
+  
+  # get basic info for detections
+  summarise(no_detections = n(),
+            no_sites = n_distinct(site),
+            .by = c(common_name, scientific_name)) %>%
+  
+  # get order and family info
+  mutate(scientific_name = if_else(scientific_name == "Accipiter gentilis", 
+                                   "Astur atricapillus", 
+                                   scientific_name)) %>%
+  left_join(clement, by = join_by(scientific_name == `scientific name`)) %>%
+  select(order, family, scientific_name, `English name`, no_detections, no_sites) %>%
+  rename(common_name = `English name`) %>%
+  arrange(order, family) %>%
+  
+  # make table
+  gt() %>%
+  cols_label(order = "Order",
+             family = "Family",
+             scientific_name = "Scientific name",
+             common_name = "Common name",
+             no_detections = "No. detections",
+             no_sites = "No. sites") %>%
+  cols_align(align = "center") %>%
+  tab_options(table.font.size = 12) %>%
+  tab_style(style = cell_borders(sides = "bottom", color = "white", weight = px(1)),
+    locations = cells_body()) %>%
+  tab_style(style = cell_borders(sides = "bottom", color = "black", weight = px(1)),
+            locations = cells_body(rows = family != lead(family, default = last(family))))
+  
+gtsave(data = species_table, 
+       filename = here("docs", "tables", "species_table.rtf"))
+
+
+
+
+
+
+
+

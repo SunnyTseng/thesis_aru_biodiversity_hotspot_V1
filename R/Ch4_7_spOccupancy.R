@@ -72,6 +72,26 @@ OSFL_occ <- OSFL_occ_0 %>%
   as.matrix() 
 
 
+# visualization 
+OSFL_vis <- OSFL_occ_0 %>%
+  pivot_longer(-site, names_to = "year_week", values_to = "occupancy") %>%
+  mutate(occupancy = replace_na(occupancy, -1)) %>%
+  separate_wider_delim(year_week, delim = "_", names = c("year", "week")) %>%
+  mutate(year = as.numeric(year), week = as.numeric(week)) %>%
+  
+  # plot
+  ggplot(aes(x = week, y = site, fill = factor(occupancy))) +
+  geom_tile() + 
+  scale_fill_manual(values = c("white", "gray", "black")) +
+  facet_wrap(~ year, scales = "free_x") + 
+  
+  theme_bw() +
+  theme(legend.position="none")
+
+OSFL_vis
+
+
+
 
 # occurrence covariates ---------------------------------------------------
 
