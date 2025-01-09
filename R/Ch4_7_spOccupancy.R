@@ -82,13 +82,29 @@ OSFL_vis <- OSFL_occ_0 %>%
   # plot
   ggplot(aes(x = week, y = site, fill = factor(occupancy))) +
   geom_tile() + 
-  scale_fill_manual(values = c("white", "gray", "black")) +
+  scale_fill_manual(values = c("white", "lightsteelblue1", "darkslategrey")) +
   facet_wrap(~ year, scales = "free_x") + 
   
+  scale_x_continuous(breaks = pretty_breaks()) +
+  scale_y_discrete(guide = guide_axis(n.dodge = 2)) +
+  
   theme_bw() +
-  theme(legend.position="none")
+  labs(x = "Week of the year", y = "Site") +
+  theme(legend.position = "none",
+        strip.background = element_rect(fill = "azure3"),
+        strip.text.x = element_text(size = 12),
+        
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 12),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+        axis.title.x = element_text(margin = margin(t = 5, r = 0, b = 0, l = 0)))
 
-OSFL_vis
+
+ggsave(filename = here("docs", "figures", "occupancy_matrix.png"),
+       width = 28,
+       height = 20,
+       units = "cm",
+       dpi = 300)
 
 
 

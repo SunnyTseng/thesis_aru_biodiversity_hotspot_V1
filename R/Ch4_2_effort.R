@@ -81,7 +81,7 @@ effort_change <- ggplot(data = vis_wrangling_1) +
   scale_colour_brewer(palette = "Accent") +
   scale_x_date(date_labels = "%b", date_breaks = "1 month") +
   theme_bw() +
-  labs(x = "Day of a year", y = "No. of ARU") +
+  labs(x = "Day of the year", y = "No. of ARU") +
   theme(axis.title = element_text(size = 16),
         axis.text = element_text(size = 12),
         legend.title = element_blank(),
@@ -185,7 +185,7 @@ ggdraw() +
   draw_plot(combined, x = 0, y = 0) +
   draw_plot(inset, x = 0.12, y = 0.68, width = 0.32, height = 0.32) 
 
-ggsave(filename = here("docs", "figures", "ARU_effort.jpg"),
+ggsave(filename = here("docs", "figures", "ARU_effort.png"),
        width = 22,
        height = 22,
        units = "cm",

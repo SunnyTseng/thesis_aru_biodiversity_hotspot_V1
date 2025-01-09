@@ -7,9 +7,6 @@ library(here)
 library(tuneR)
 library(seewave)
 
-# import data -------------------------------------------------------------
-
-load(here("data", "BirdNET_detections", "bird_data_cleaned_target.rda"))
 
 # function for moving recordings to a given folder
 move_recording <- function(id, filepath, start, end, 
@@ -27,6 +24,10 @@ move_recording <- function(id, filepath, start, end,
                                      paste0(target_species, "_", id, ".wav")))
   
 }
+
+# import data -------------------------------------------------------------
+
+load(here("data", "BirdNET_detections", "bird_data_cleaned_target.rda"))
 
 
 # isolate recording segments for validation -------------------------------
@@ -59,22 +60,6 @@ for (target_species in species) {
   pmap(table, move_recording)          
 }
 
-
-# run the shinyApp for validation -----------------------------------------
-
-library(shiny) 
-library(bslib)
-library(shinyWidgets) 
-library(shinyFiles)
-
-library(tidyverse)
-library(DT)
-library(praise)
-
-library(tuneR)
-library(seewave)
-
-shiny::runGitHub("Birds-Canada-ARU-2024", "SunnyTseng", subdir = "R")
 
 
 
