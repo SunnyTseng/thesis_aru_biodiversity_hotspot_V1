@@ -33,7 +33,7 @@ species_list_BC <- read_csv(here("data", "bird_list", "species_bc_breeding_bird_
 #
 # save(bird_data_cleaned, file = here("bird_data_cleaned.RData"))
 
-load(here("bird_data_cleaned.RData"))
+load(here("data", "BirdNET_detections", "bird_data_cleaned.RData"))
 
 
 # species list validation with 0.975 --------------------------------------
@@ -85,24 +85,25 @@ species_list_additional <- read_csv(here("data", "bird_list",
 species_list_filter_1 <- species_list_additional %>%
   drop_na(code)
 
-## remove the species that don't appear more than one site, or more than 10
+## remove the species that don't appear more than one site, or more than 1
 ## different days
 species_effort <- bird_data_cleaned %>%
   group_by(scientific_name, common_name) %>%
+  filter(date %within% interval(ymd("2020-06-01"), ymd("2020-06-30")) |
+           date %within% interval(ymd("2021-06-01"), ymd("2021-06-30")) | 
+           date %within% interval(ymd("2022-06-01"), ymd("2022-06-30"))) %>%
   filter(site %>% n_distinct() > 1) %>%
   filter(date %>% date() %>% n_distinct() > 1) %>%
-  filter(date %within% interval(ymd("2020-05-01"), ymd("2020-07-31")) |
-           date %within% interval(ymd("2021-05-01"), ymd("2021-07-31")) | 
-           date %within% interval(ymd("2022-05-01"), ymd("2022-07-31"))) %>%
   distinct(scientific_name, common_name) %>%
   mutate(effort = "Y")
+
 
 species_list_filter_2 <- species_list_filter_1 %>%
   left_join(species_effort) %>%
   drop_na(effort) %>%
   select(-effort)
 
-write_csv(species_list_filter_2, 
-          here("data", "bird_list", "species_list_final.csv"))
+#write_csv(species_list_filter_2, 
+#          here("data", "bird_list", "species_list_final.csv"))
 
 

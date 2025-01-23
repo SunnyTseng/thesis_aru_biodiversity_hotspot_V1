@@ -8,6 +8,7 @@ library(here)
 library(spOccupancy)
 library(terra)
 library(stars)
+library(scales)
 
 
 
@@ -22,12 +23,14 @@ load(here("data", "BirdNET_detections", "bird_data_cleaned_target.rda"))
 load(here("data", "effort", "effort_site_date.RData"))
 
 effort <- effort_eval_1 %>%
-  mutate(year = year(datetime),
-         week = week(datetime)) %>%
-  distinct(site, year, week) 
+  filter(datetime %within% interval(ymd("2020-06-01"), ymd("2020-06-30")) |
+           datetime %within% interval(ymd("2021-06-01"), ymd("2021-06-30")) | 
+           datetime %within% interval(ymd("2022-06-01"), ymd("2022-06-30"))) %>%
+  mutate(period = floor_date(datetime, unit = "5 days")) %>%
+  distinct(site, period) 
 
 
-# covariate data
+# covariate data for modelling
 cov_lidar <- readxl::read_xlsx(here("data", "JPRF_lidar_2015", 
                                     "JPRF_veg_Lidar_2015_summarized.xlsx"), 
                                sheet = "100") %>%
@@ -45,6 +48,8 @@ cov_prediction <- rast(here("data", "JPRF_lidar_2015",
 
 
 
+
+
 # OSFL occurrence data ----------------------------------------------------
 
 OSFL_occ_0 <- bird_data_cleaned_target %>%
@@ -53,43 +58,50 @@ OSFL_occ_0 <- bird_data_cleaned_target %>%
   filter(common_name == "Olive-sided Flycatcher") %>%
   filter(confidence >= 0.35) %>%
   
-  # check OSFL detections for each week (1 or 0)
-  mutate(year = year(datetime),
-         week = week(datetime)) %>%
-  summarize(detections = n(), .by = c(year, week, site)) %>%
+  # retain detection within study period
+  filter(datetime %within% interval(ymd("2020-06-01"), ymd("2020-06-30")) |
+           datetime %within% interval(ymd("2021-06-01"), ymd("2021-06-30")) | 
+           datetime %within% interval(ymd("2022-06-01"), ymd("2022-06-30"))) %>%
+  
+  # check OSFL detection (1 or 0)
+  mutate(period = floor_date(datetime, unit = "5 days")) %>%
+  summarize(detections = n(), .by = c(site, period)) %>%
   right_join(effort) %>%
   mutate(detections = if_else(is.na(detections), 0, 1)) %>%
+  arrange(period) %>%
   
-  # turn into a matrix and to reflect missing visit
-  unite(col = "year_week", year, week) %>%
+  # check OSFL detections (NA or keep original value)
   pivot_wider(id_cols = site, 
-              names_from = year_week, 
-              values_from = detections) 
+              names_from = period, 
+              values_from = detections) %>%
+  arrange(site)
 
-# transform to matrix
+
+# turn into a matrix and to reflect missing visit
 OSFL_occ <- OSFL_occ_0 %>%
   column_to_rownames(var = "site") %>%
   as.matrix() 
 
 
+
 # visualization 
 OSFL_vis <- OSFL_occ_0 %>%
-  pivot_longer(-site, names_to = "year_week", values_to = "occupancy") %>%
-  mutate(occupancy = replace_na(occupancy, -1)) %>%
-  separate_wider_delim(year_week, delim = "_", names = c("year", "week")) %>%
-  mutate(year = as.numeric(year), week = as.numeric(week)) %>%
-  
+  pivot_longer(-site, names_to = "period", values_to = "detections") %>%
+  mutate(detections = replace_na(detections, -1),
+         period = ymd(period),
+         year = year(period)) %>%
   # plot
-  ggplot(aes(x = week, y = site, fill = factor(occupancy))) +
+  ggplot(aes(x = period, y = site, fill = factor(detections))) +
   geom_tile() + 
   scale_fill_manual(values = c("white", "lightsteelblue1", "darkslategrey")) +
   facet_wrap(~ year, scales = "free_x") + 
   
-  scale_x_continuous(breaks = pretty_breaks()) +
+  scale_x_date(breaks = scales::pretty_breaks(n = 3), # Automatically choose ~3 breaks
+               date_labels = "%b%d") +
   scale_y_discrete(guide = guide_axis(n.dodge = 2)) +
   
   theme_bw() +
-  labs(x = "Week of the year", y = "Site") +
+  labs(x = "Date", y = "Site") +
   theme(legend.position = "none",
         strip.background = element_rect(fill = "azure3"),
         strip.text.x = element_text(size = 12),
@@ -99,6 +111,7 @@ OSFL_vis <- OSFL_occ_0 %>%
         axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
         axis.title.x = element_text(margin = margin(t = 5, r = 0, b = 0, l = 0)))
 
+OSFL_vis
 
 ggsave(filename = here("docs", "figures", "occupancy_matrix.png"),
        width = 28,
