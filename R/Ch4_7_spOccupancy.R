@@ -238,7 +238,7 @@ ggplot() +
   geom_stars(data = dat.stars, aes(x = x, y = y, 
                                    fill = mean.psi)) +
   #scale_fill_viridis_c(option = "plasma", na.value = "transparent") +
-  scale_fill_gradient(low = "white", high = "lightsteelblue4", na.value = "transparent") +
+  scale_fill_gradient(low = "white", high = "lightsteelblue4", na.value = "white") +
   labs(x = 'Easting', y = 'Northing', fill = '', 
        title = 'Mean OSFL occurrence probability') +
   theme_bw()
