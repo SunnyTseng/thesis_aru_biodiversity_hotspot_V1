@@ -113,11 +113,11 @@ OSFL_vis <- OSFL_occ_0 %>%
 
 OSFL_vis
 
-ggsave(filename = here("docs", "figures", "occupancy_matrix.png"),
-       width = 28,
-       height = 20,
-       units = "cm",
-       dpi = 300)
+# ggsave(filename = here("docs", "figures", "occupancy_matrix.png"),
+#        width = 28,
+#        height = 20,
+#        units = "cm",
+#        dpi = 300)
 
 
 
@@ -132,12 +132,31 @@ OSFL_cov <- cov_lidar %>%
 
 # detection covariates ----------------------------------------------------
 
+J <- nrow(OSFL_occ_0)
+K <- ncol(OSFL_occ_0)
+
+yday <- matrix(NA, nrow = J, ncol = K-1)
+for (j in 1:J) {
+  for (k in 2:K) {
+    if (!is.na(OSFL_occ_0[j, k])) {
+      yday[j, k -1] <- names(OSFL_occ_0)[k] %>% as_date() %>% yday()
+    }
+  }
+}
+
+
 OSFL_det <- list(
-  woy <- OSFL_occ_0 %>%
-    names() %>%
-    str_split_i(pattern = "_", 2) %>%
-    .[!is.na(.)]
+  yday = yday
 )
+
+
+
+
+
+
+
+
+
   
 
 
@@ -152,7 +171,7 @@ str(OSFL_data)
 
 # formula
 OSFL_occ_formula <- ~ scale(cc10)
-OSFL_det_formula <- ~ woy
+OSFL_det_formula <- ~ yday
 
 
 OSFL_inits <- list(alpha = 0, 
@@ -228,8 +247,8 @@ ggplot() +
 ggplot() + 
   geom_raster(data = cov_prediction, aes(x = x, y = y, fill = cc10)) +
   scale_fill_viridis_c(option = "plasma") +
-  labs(x = 'Easting', y = 'Northing', fill = 'Crown Closure above 10m (%)', 
-       title = 'Crown Closure above 10m') +
+  labs(x = 'Easting', y = 'Northing', fill = '', 
+       title = 'Crown Closure above 10m (%)') +
   theme_bw()
 
 
