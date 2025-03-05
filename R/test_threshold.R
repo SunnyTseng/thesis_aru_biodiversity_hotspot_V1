@@ -6,8 +6,10 @@
 library(tidyverse)
 library(readxl)
 library(here)
-library(scales)
 
+library(scales)
+library(terra)
+library(stars)
 
 
 # functions ---------------------------------------------------------------
@@ -76,6 +78,19 @@ cov_lidar <- read_xlsx(here("data", "JPRF_lidar_2015",
                        sheet = "100") %>%
   rename(site = Site) %>%
   mutate(site = str_replace(site, "^N(\\d+)", "N_\\1"))
+
+
+
+# covariate data for prediction
+cov_1 <- rast(here("data", "JPRF_lidar_2015", "JPRF_veg_Lidar_2015_raw", "Crown_Closure_above_10m_zero1.tif")) 
+  
+cov_2 <- rast(here("data", "JPRF_lidar_2015", "JPRF_veg_Lidar_2015_raw", "vdr95.tif"))
+
+cov_prediction <- c(cov_1, cov_2) %>%
+  #aggregate(fact = 15, fun = mean) %>%
+  as.data.frame(xy = TRUE) %>%
+  as_tibble() %>%
+  rename(cc10 = Crown_Closure_above_10m_zero1, VDI = vdr95)
 
 
 # get the threshold for each species -------------------------------------
@@ -205,13 +220,13 @@ diversity_vis <- diversity %>%
   scale_x_date(breaks = scales::pretty_breaks(n = 3), # Automatically choose ~3 breaks
                date_labels = "%b%d") +
   scale_y_discrete(guide = guide_axis(n.dodge = 2)) +
-  scale_fill_continuous(type = "viridis", na.value = "white") +
+  scale_fill_continuous(type = "viridis") +
   facet_wrap(~ year, scales = "free_x") + 
   
   # set theme
   theme_bw() +
   labs(x = "Date", y = "Site") +
-  theme(legend.position = "none",
+  theme(legend.position = "bottom",
         strip.background = element_rect(fill = "azure3"),
         strip.text.x = element_text(size = 12),
         
@@ -231,15 +246,60 @@ diversity_vis
 diversity_model_data <- diversity %>%
   left_join(cov_lidar, by = join_by(site)) %>%
   mutate(yday = yday(period),
-         year = year(period) %>% as_factor())
+         year = year(period) %>% as_factor(),
+         cc10_scale = scale(cc10),
+         VDI_scale = scale(VDI))
 
-model <- glm(richness ~ cc10 + year + yday,
+model <- glm(richness ~ cc10_scale + VDI_scale + year + yday,
              data = diversity_model_data, 
              family = "poisson")
 
 summary(model)
 
 
+
+
+# use the glm to predict the richness map ---------------------------------
+X.0 <- cov_prediction %>%
+  mutate(cc10_scale = scale(cc10),
+         VDI_scale = scale(VDI),
+         year = 2021 %>% as_factor(),
+         yday = 180) 
+
+richness_pred <- predict(model, X.0, type = "response")
+
+
+
+# Make a species richness map based on predicted values
+richness_vis <- data.frame(x = cov_prediction$x, 
+                           y = cov_prediction$y, 
+                           richness = richness_pred)
+
+
+dat.stars <- richness_vis %>%
+  st_as_stars(dims = c('x', 'y'))
+
+
+ggplot() + 
+  geom_stars(data = dat.stars, aes(x = x, y = y, 
+                                   fill = richness)) +
+  #scale_fill_viridis_c(option = "plasma", na.value = "transparent") +
+  scale_fill_gradient(low = "white", 
+                      high = "lightsteelblue4",
+                      na.value = "transparent") +
+  labs(x = 'Easting', y = 'Northing', 
+       fill = 'Richness', title = 'Species Richness') +
+  theme_bw()
+
+
+
+# plot the cov_prediction
+ggplot() + 
+  geom_raster(data = cov_prediction, aes(x = x, y = y, fill = cc10)) +
+  scale_fill_viridis_c(option = "plasma") +
+  labs(x = 'Easting', y = 'Northing', fill = '', 
+       title = 'Crown Closure above 10m (%)') +
+  theme_bw()
 
 
 
