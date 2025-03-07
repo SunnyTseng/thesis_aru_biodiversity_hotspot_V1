@@ -11,6 +11,8 @@ library(scales)
 library(terra)
 library(stars)
 
+library(iNEXT)
+
 
 # functions ---------------------------------------------------------------
 
@@ -184,7 +186,35 @@ bird_data_cleaned_target_threshold <- bird_data_cleaned_target %>%
 
 
 
-# get the richness matrix (response variable) -----------------------------
+
+
+# Method 1: get the Hill number of each site
+
+Hills <- bird_data_cleaned_target_threshold %>%
+  mutate(date = date(datetime)) %>%
+  group_nest(site) %>%
+  mutate(species_matrix = map(.x = data, .f =~ .x %>%
+                                group_by(common_name) %>%
+                                summarize(ARU_days = n_distinct(date)))) %>%
+  select(-data) 
+
+
+Hills$species_matrix[[1]]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Methoed 2: get the richness matrix (response variable) -----------------------------
 
 
 # get the richness list for functioning days
@@ -241,7 +271,7 @@ diversity_vis
 
 
 
-# fit the glm for (richness values & LiDAR covariate) ---------------------
+# Method 2: fit the glm for (richness values & LiDAR covariate) ---------------------
 
 diversity_model_data <- diversity %>%
   left_join(cov_lidar, by = join_by(site)) %>%
@@ -259,7 +289,7 @@ summary(model)
 
 
 
-# use the glm to predict the richness map ---------------------------------
+# Method 2:use the glm to predict the richness map ---------------------------------
 X.0 <- cov_prediction %>%
   mutate(cc10_scale = scale(cc10),
          VDI_scale = scale(VDI),
