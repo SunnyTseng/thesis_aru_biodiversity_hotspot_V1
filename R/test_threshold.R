@@ -208,10 +208,12 @@ Hills <- bird_data_cleaned_target_threshold %>%
   
   # create incidence_freq data
   mutate(incidence_freq = map2(.x = site_ARU_days, .y = species_matrix,
-                               .f =~ c(.x, .y$species_ARU_days))) %>%
+                               .f =~ c(.x, .y$species_ARU_days) %>%
+                                 setNames(., c("Total", .y$common_name)))) %>%
   
   # remove the sites that don't have enough ARU days
-  filter(site_ARU_days >= 10)
+  filter(site_ARU_days >= 30)
+
 
 
 # visualization of the ARU days that one specie got observed
@@ -240,8 +242,10 @@ Hills_vis <- Hills %>%
 Hills_vis
 
 
+
 # data formation for the iNEXT calculation  
-Hills_incidence_freq <- setNames(Hills$incidence_freq, Hills$site)
+Hills_incidence_freq <- setNames(Hills$incidence_freq, Hills$site) 
+
 
 
 # richness plot & table
@@ -259,9 +263,18 @@ iNEXT_richness_table <- iNEXT_richness_model$DataInfo %>%
               as_tibble(rownames = "site"))
 
 iNEXT_richness_plot <- ggiNEXT(iNEXT_richness_model, type = 1) + 
-  theme_bw() + 
-  theme(legend.position = "none")
+  labs(x = "ARU days", y = "# of species") +
+  # set theme
+  theme_bw() +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.8, 0.2),
+        legend.text = element_text(size = 16),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 12),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+        axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))
 
+iNEXT_richness_plot
 
 
 
@@ -271,13 +284,16 @@ diversity_model_data <- iNEXT_richness_table %>%
   left_join(cov_lidar, by = join_by(site)) %>%
   mutate(cc10_scale = scale(cc10),
          VDI_scale = scale(VDI),
-         Estimator = round(Estimator))
+         Estimator_int = round(Estimator))
 
-model <- glm(Estimator ~ cc10_scale + VDI_scale,
+model <- glm(Estimator_int ~ cc10 + VDI,
              data = diversity_model_data, 
              family = "poisson")
 
 summary(model)
+
+
+
 
 
 
