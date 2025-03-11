@@ -65,13 +65,17 @@ load(here("data", "BirdNET_detections", "bird_data_cleaned_target.rda"))
 # effort data
 load(here("data", "effort", "effort_site_date.RData"))
 
-effort <- effort_eval_1 %>%
+effort_5 <- effort_eval_1 %>%
   filter(datetime %within% interval(ymd("2020-06-01"), ymd("2020-07-15")) |
            datetime %within% interval(ymd("2021-06-01"), ymd("2021-07-15")) | 
            datetime %within% interval(ymd("2022-06-01"), ymd("2022-07-15"))) %>%
   mutate(period = floor_date(datetime, unit = "5 days")) %>%
   distinct(site, period) 
 
+effort_1 <- effort_eval_1 %>%
+  mutate(date = date(datetime)) %>%
+  distinct(site, date) %>%
+  summarize(site_ARU_days = n(), .by = site)
 
 
 # covariate data for modelling
@@ -187,27 +191,136 @@ bird_data_cleaned_target_threshold <- bird_data_cleaned_target %>%
 
 
 
+# Method 1: get the Hill number of each site ------------------------------
 
-# Method 1: get the Hill number of each site
 
+# general data summary 
 Hills <- bird_data_cleaned_target_threshold %>%
+  
+  # data wrangling
   mutate(date = date(datetime)) %>%
   group_nest(site) %>%
   mutate(species_matrix = map(.x = data, .f =~ .x %>%
                                 group_by(common_name) %>%
-                                summarize(ARU_days = n_distinct(date)))) %>%
-  select(-data) 
+                                summarize(species_ARU_days = n_distinct(date)))) %>%
+  select(-data) %>%
+  left_join(effort_1) %>%
+  
+  # create incidence_freq data
+  mutate(incidence_freq = map2(.x = site_ARU_days, .y = species_matrix,
+                               .f =~ c(.x, .y$species_ARU_days))) %>%
+  
+  # remove the sites that don't have enough ARU days
+  filter(site_ARU_days >= 10)
 
 
-Hills$species_matrix[[1]]
+# visualization of the ARU days that one specie got observed
+Hills_vis <- Hills %>%
+  select(-incidence_freq) %>%
+  unnest(species_matrix) %>%
+  
+  # plot
+  ggplot(aes(x = site, y = common_name, fill = species_ARU_days)) +
+  geom_tile() + 
+  
+  # fine tune
+  scale_x_discrete(guide = guide_axis(n.dodge = 3),
+                   position = "top") +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1) +
+  
+  # set theme
+  theme_bw() +
+  labs(x = "Site", y = "Species") +
+  theme(legend.position = "right",
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 12),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+        axis.title.x = element_text(margin = margin(t = 0, r = 0, b = 10, l = 0)))
+
+Hills_vis
+
+
+# data formation for the iNEXT calculation  
+Hills_incidence_freq <- setNames(Hills$incidence_freq, Hills$site)
+
+
+# richness plot & table
+iNEXT_richness_model <- iNEXT(Hills_incidence_freq, 
+                              q = 0,
+                              datatype = "incidence_freq")
+
+iNEXT_richness_table <- iNEXT_richness_model$DataInfo %>%
+  as_tibble() %>%
+  rename(site = Assemblage) %>%
+  select(site, "T", "U", S.obs, SC) %>%
+  left_join(ChaoRichness(Hills_incidence_freq, 
+                         datatype = "incidence_freq", 
+                         conf = 0.95) %>%
+              as_tibble(rownames = "site"))
+
+iNEXT_richness_plot <- ggiNEXT(iNEXT_richness_model, type = 1) + 
+  theme_bw() + 
+  theme(legend.position = "none")
 
 
 
 
+# Method 1: build the GLM -------------------------------------------------
+
+diversity_model_data <- iNEXT_richness_table %>%
+  left_join(cov_lidar, by = join_by(site)) %>%
+  mutate(cc10_scale = scale(cc10),
+         VDI_scale = scale(VDI),
+         Estimator = round(Estimator))
+
+model <- glm(Estimator ~ cc10_scale + VDI_scale,
+             data = diversity_model_data, 
+             family = "poisson")
+
+summary(model)
 
 
 
+# Method 1: GLM model prediction ------------------------------------------
 
+X.0 <- cov_prediction %>%
+  mutate(cc10_scale = scale(cc10),
+         VDI_scale = scale(VDI)) 
+
+richness_pred <- predict(model, X.0, type = "response")
+
+
+
+# Make a species richness map based on predicted values
+richness_vis <- data.frame(x = cov_prediction$x, 
+                           y = cov_prediction$y, 
+                           richness = richness_pred)
+
+
+dat.stars <- richness_vis %>%
+  st_as_stars(dims = c('x', 'y'))
+
+
+ggplot() + 
+  geom_stars(data = dat.stars, aes(x = x, y = y, 
+                                   fill = richness)) +
+  #scale_fill_viridis_c(option = "plasma", na.value = "transparent") +
+  scale_fill_gradient(low = "white", 
+                      high = "lightsteelblue4",
+                      na.value = "transparent") +
+  labs(x = 'Easting', y = 'Northing', 
+       fill = 'Richness', title = 'Predicted asymptotic richness') +
+  theme_bw()
+
+
+
+# plot the cov_prediction
+ggplot() + 
+  geom_raster(data = cov_prediction, aes(x = x, y = y, fill = cc10)) +
+  scale_fill_viridis_c(option = "plasma") +
+  labs(x = 'Easting', y = 'Northing', fill = '', 
+       title = 'Crown Closure above 10m (%)') +
+  theme_bw()
 
 
 
@@ -223,17 +336,9 @@ diversity <- bird_data_cleaned_target_threshold %>%
   # check richness in each site + period combination
   mutate(period = floor_date(datetime, unit = "5 days")) %>%
   summarise(richness = n_distinct(common_name), .by = c(site, period)) %>%
-  right_join(effort) %>% 
+  right_join(effort_5) %>% 
   mutate(richness = if_else(is.na(richness), 0, richness)) %>%
   arrange(period)
-
-
-# get the richness into matrix for both functioning and not functioning (NA)
-# diversity_wide <- diversity %>%
-#   pivot_wider(id_cols = site,
-#               names_from = period,
-#               values_from = richness) %>%
-#   arrange(site)
 
 
 # visualization 
@@ -289,7 +394,7 @@ summary(model)
 
 
 
-# Method 2:use the glm to predict the richness map ---------------------------------
+# Method 2: use the glm to predict the richness map ---------------------------------
 X.0 <- cov_prediction %>%
   mutate(cc10_scale = scale(cc10),
          VDI_scale = scale(VDI),
@@ -330,6 +435,9 @@ ggplot() +
   labs(x = 'Easting', y = 'Northing', fill = '', 
        title = 'Crown Closure above 10m (%)') +
   theme_bw()
+
+
+
 
 
 
