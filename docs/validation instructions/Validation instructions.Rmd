@@ -64,7 +64,7 @@ shiny::runGitHub("Birds-Canada-ARU-2024", "SunnyTseng", subdir = "R")
     -   The file path of the folder that contains the segments. This is the species folder that you downloaded.
 
 | select meta data                     | select recording folder              |
-|------------------------------------|------------------------------------|
+|--------------------------------------|--------------------------------------|
 | ![](images/clipboard-3018843216.png) | ![](images/clipboard-1068388884.png) |
 
 -   The .csv file would be shown on the top panel (with few selected columns). Once you click on the "Spectrogram" button, the bottom panel would show the corresponded spectrogram. And if you click the "Audio" button, it would play that specific segment for you.
