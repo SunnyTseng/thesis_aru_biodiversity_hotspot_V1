@@ -41,8 +41,19 @@ precision2threshold <- function(threshold_table, precision){
 # import data -------------------------------------------------------------
 
 # validation data
-data_validation <- list.files(here("data", "validation_output_files"), full.names = TRUE) %>%
-  map_dfr(~ read_excel(.x, col_types = "text")) 
+data_validation <- list.files(here("data", "validation_output_files"), 
+                              full.names = TRUE) %>%
+  map_dfr(~ {
+    if (grepl("\\.csv$", .x, ignore.case = TRUE)) {
+      read_csv(.x, col_types = cols(.default = "c")) # Read CSV
+    } else if (grepl("\\.xlsx$", .x, ignore.case = TRUE)) {
+      read_excel(.x, col_types = "text") # Read Excel
+    } else {
+      stop("Unsupported file format: ", .x)
+    }
+  })
+
+
 
 data_validation_cleaned <- data_validation %>%
   select(-matches("^\\.\\.\\.")) %>%
@@ -61,6 +72,11 @@ data_validation_cleaned <- data_validation %>%
 load(here("data", "BirdNET_detections", "bird_data_cleaned_target.rda"))
 
 
+# target species list
+target_species <- read_excel(here("docs", "random", "species_table.xlsx")) %>%
+  filter(used == "Y") %>%
+  select(family, scientific_name, common_name, used)
+
 
 # effort data
 load(here("data", "effort", "effort_site_date.RData"))
@@ -78,6 +94,7 @@ effort_1 <- effort_eval_1 %>%
   summarize(site_ARU_days = n(), .by = site)
 
 
+
 # covariate data for modelling
 cov_lidar <- read_xlsx(here("data", "JPRF_lidar_2015", 
                             "JPRF_veg_Lidar_2015_summarized.xlsx"), 
@@ -88,12 +105,13 @@ cov_lidar <- read_xlsx(here("data", "JPRF_lidar_2015",
 
 
 # covariate data for prediction
-cov_1 <- rast(here("data", "JPRF_lidar_2015", "JPRF_veg_Lidar_2015_raw", "Crown_Closure_above_10m_zero1.tif")) 
-  
-cov_2 <- rast(here("data", "JPRF_lidar_2015", "JPRF_veg_Lidar_2015_raw", "vdr95.tif"))
+cov_1 <- rast(here("data", "JPRF_lidar_2015", "JPRF_veg_Lidar_2015_raw", 
+                   "Crown_Closure_above_10m_zero1.tif")) 
+
+cov_2 <- rast(here("data", "JPRF_lidar_2015", "JPRF_veg_Lidar_2015_raw", 
+                   "vdr95.tif"))
 
 cov_prediction <- c(cov_1, cov_2) %>%
-  #aggregate(fact = 15, fun = mean) %>%
   as.data.frame(xy = TRUE) %>%
   as_tibble() %>%
   rename(cc10 = Crown_Closure_above_10m_zero1, VDI = vdr95)
@@ -109,7 +127,6 @@ species_list <- data_validation_cleaned %>%
 
 thresholds <- numeric(length(species_list))
 names(thresholds) <- species_list
-
 
 
 # loop across the full species list
@@ -167,7 +184,7 @@ for (species in species_list) {
   
   
   # Assign the calculated threshold
-  thresholds[species] <- precision2threshold(precision_table, 0.90)
+  thresholds[species] <- precision2threshold(precision_table, 0.95)
   thresholds <- pmax(thresholds, 0.1)
   thresholds <- pmin(thresholds, 1)
 }
@@ -184,9 +201,8 @@ threshold_df <- tibble(
 
 bird_data_cleaned_target_threshold <- bird_data_cleaned_target %>%
   left_join(threshold_df) %>%
-  filter(confidence >= threshold) 
-
-
+  filter(confidence >= threshold) %>%
+  filter(scientific_name %in% target_species$scientific_name) 
 
 
 
@@ -255,18 +271,31 @@ iNEXT_richness_model <- iNEXT(Hills_incidence_freq,
 
 iNEXT_richness_table <- iNEXT_richness_model$DataInfo %>%
   as_tibble() %>%
-  rename(site = Assemblage) %>%
-  select(site, "T", "U", S.obs, SC) %>%
+  rename(site = Assemblage,
+         ARU_days = "T",
+         species_ARU_days = "U") %>%
+  select(site, ARU_days, species_ARU_days, S.obs, SC) %>%
   left_join(ChaoRichness(Hills_incidence_freq, 
                          datatype = "incidence_freq", 
                          conf = 0.95) %>%
-              as_tibble(rownames = "site"))
+              as_tibble(rownames = "site")) %>%
+  rename(observed = Observed,
+         estimated = Estimator,
+         est_95_lower = `95% Lower`,
+         est_95_upper = `95% Upper`) %>%
+  select(site, ARU_days, species_ARU_days, 
+         observed, estimated, est_95_lower, est_95_upper)
 
-iNEXT_richness_plot <- ggiNEXT(iNEXT_richness_model, type = 1) + 
+
+
+iNEXT_richness_plot <- ggiNEXT(iNEXT_richness_model, 
+                               type = 1,
+                               se = FALSE) + 
   labs(x = "ARU days", y = "# of species") +
+  
   # set theme
   theme_bw() +
-  theme(legend.position = "inside",
+  theme(legend.position = "none",
         legend.position.inside = c(0.8, 0.2),
         legend.text = element_text(size = 16),
         axis.title = element_text(size = 16),
