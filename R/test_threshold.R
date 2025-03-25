@@ -5,6 +5,7 @@
 
 library(tidyverse)
 library(readxl)
+library(janitor)
 library(here)
 
 library(scales)
@@ -99,7 +100,7 @@ effort_1 <- effort_eval_1 %>%
 cov_lidar <- read_xlsx(here("data", "JPRF_lidar_2015", 
                             "JPRF_veg_Lidar_2015_summarized.xlsx"), 
                        sheet = "100") %>%
-  rename(site = Site) %>%
+  clean_names() %>%
   mutate(site = str_replace(site, "^N(\\d+)", "N_\\1"))
 
 
@@ -281,10 +282,11 @@ iNEXT_richness_table <- iNEXT_richness_model$DataInfo %>%
               as_tibble(rownames = "site")) %>%
   rename(observed = Observed,
          estimated = Estimator,
+         est_se = Est_s.e.,
          est_95_lower = `95% Lower`,
          est_95_upper = `95% Upper`) %>%
   select(site, ARU_days, species_ARU_days, 
-         observed, estimated, est_95_lower, est_95_upper)
+         observed, estimated, est_se, est_95_lower, est_95_upper)
 
 
 
@@ -310,16 +312,41 @@ iNEXT_richness_plot
 # Method 1: build the GLM -------------------------------------------------
 
 diversity_model_data <- iNEXT_richness_table %>%
+  #crossing(bootstrap_id = 1:5) %>%
+  # rowwise() %>%
+  # mutate(bootstrap_est = runif(1, est_95_lower, est_95_upper)) %>%
+  # ungroup() %>%
   left_join(cov_lidar, by = join_by(site)) %>%
-  mutate(cc10_scale = scale(cc10),
-         VDI_scale = scale(VDI),
-         Estimator_int = round(Estimator))
+  select(estimated, est_se,
+         dem, slope, aspect, cc1_3, cc3_10, cc10, chm, vdi, vdi_95, 
+         ba_dens_x100, dist_wet_lidar, d_vr_ipolyedge, 
+         prop_decid_100m, age0_20_1000, site_class) 
+  #mutate(across(-c(1, 2), scale, .names = "{.col}_scaled"))
 
-model <- glm(Estimator_int ~ cc10 + VDI,
-             data = diversity_model_data, 
-             family = "poisson")
 
-summary(model)
+# fit the full model and all the possible combinations of the variables
+predictor_vars <- diversity_model_data %>%
+  select(-c(1, 2)) %>%
+  #select(matches("_scaled")) %>%
+  colnames() %>%
+  paste(collapse = " + ") 
+
+
+options(na.action = "na.fail")
+full <- lm(as.formula(paste("estimated", "~", predictor_vars)), 
+                      data = diversity_model_data)
+
+res <- dredge(full, trace = 2)
+
+
+# model selection, which only keeps the model that reach <2 in delta AIC
+subset(res, delta <= 2, recalc.weights=FALSE)
+
+# get the importance of each of the variable by their sum of weights
+sw(res)
+
+# get the average of the model
+summary(model.avg(res))
 
 
 
