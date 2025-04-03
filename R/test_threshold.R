@@ -55,7 +55,6 @@ data_validation <- list.files(here("data", "validation_output_files"),
   })
 
 
-
 data_validation_cleaned <- data_validation %>%
   select(-matches("^\\.\\.\\.")) %>%
   mutate(id = as.numeric(id),
@@ -139,7 +138,7 @@ for (species in species_list) {
     filter(validation != -1)
   
   if (mean(species_data$validation == 1, na.rm = TRUE) > 0.95) { # more than 95% of the validation is true
-    message(paste("All values in validation column are 1:", species))
+    message(paste("More than 95% of the detections are true regardless of confidence:", species))
     thresholds[species] <- 0.1
     next
   }
@@ -194,17 +193,16 @@ for (species in species_list) {
 
 # filter the dataset based on the threshold -------------------------------
 
-threshold_df <- tibble(
-  common_name = names(thresholds),
-  threshold = thresholds
-)
+threshold_df <- tibble(common_name = names(thresholds),
+                       threshold = thresholds) %>%
+  left_join(target_species) %>%
+  drop_na(used)
+
 
 
 bird_data_cleaned_target_threshold <- bird_data_cleaned_target %>%
   left_join(threshold_df) %>%
-  filter(confidence >= threshold) %>%
-  filter(scientific_name %in% target_species$scientific_name) 
-
+  filter(confidence >= threshold) 
 
 
 
