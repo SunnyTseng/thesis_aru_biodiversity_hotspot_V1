@@ -18,6 +18,10 @@ clement <- read_csv(here("data", "bird_list", "Clements-v2024-October-2024-rev.c
 # bird detections to get the detection number
 load(here("data", "BirdNET_detections", "bird_data_cleaned_target.rda"))
 
+# bird detections for final list
+load(here("data", "BirdNET_detections", "bird_data_cleaned_target_threshold.rda"))
+
+
 
 
 # bird parameters table ---------------------------------------------------
@@ -94,5 +98,43 @@ gtsave(data = species_table,
 
 
 
+
+
+
+
+
+# bird species table after applying threshold -----------------------------
+
+species_table_threshold <- bird_data_cleaned_target_threshold %>%
+  
+  # filter the data for the site that ended up not using
+  filter(!site %in% c("14_27", "14_32", "N_02")) %>%
+  
+  # get basic info for detections
+  summarise(no_detections = n(),
+            no_sites = n_distinct(site),
+            threshold = unique(threshold),
+            .by = c(common_name, scientific_name)) %>%
+  
+  # get names cleaned, for changing names
+  mutate(common_name = if_else(common_name == "Pacific-slope Flycatcher", 
+                                   "Western Flycatcher", 
+                                   common_name)) %>%
+  mutate(threshold = round(threshold, 2)) %>%
+  relocate(threshold, .after = scientific_name) %>%
+  arrange(desc(no_sites), desc(no_detections)) %>%
+  
+  # make table
+  gt() %>%
+  cols_label(scientific_name = "Scientific name",
+             common_name = "Common name",
+             threshold = "Threshold (95%)",
+             no_detections = "No. detections",
+             no_sites = "No. sites") %>%
+  cols_align(align = "center") %>%
+  tab_options(table.font.size = 12) 
+
+gtsave(data = species_table_threshold, 
+       filename = here("docs", "tables", "species_table_threshold.rtf"))
 
 

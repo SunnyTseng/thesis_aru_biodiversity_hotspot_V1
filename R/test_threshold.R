@@ -199,12 +199,15 @@ threshold_df <- tibble(common_name = names(thresholds),
   drop_na(used)
 
 
-
+# filter the detections that don't achieve species-specific threshold
 bird_data_cleaned_target_threshold <- bird_data_cleaned_target %>%
   left_join(threshold_df) %>%
   filter(confidence >= threshold) 
 
 
+# save(bird_data_cleaned_target_threshold, 
+#      file = here("data", "BirdNET_detections",
+#                  "bird_data_cleaned_target_threshold.rda"))
 
 # Method 1: get the Hill number of each site ------------------------------
 
@@ -227,7 +230,9 @@ Hills <- bird_data_cleaned_target_threshold %>%
                                  setNames(., c("Total", .y$common_name)))) %>%
   
   # remove the sites that don't have enough ARU days
-  filter(site_ARU_days >= 30)
+  filter(site_ARU_days >= 15)
+
+
 
 
 
@@ -236,72 +241,108 @@ Hills_vis <- Hills %>%
   select(-incidence_freq) %>%
   unnest(species_matrix) %>%
   
+  # Rank species by the number of sites they appear in
+  group_by(common_name) %>%
+  mutate(species_presence = n_distinct(site),
+         species_ARU_days_total = sum(species_ARU_days, na.rm = TRUE)) %>%
+  ungroup() %>%
+  arrange(desc(species_presence), desc(species_ARU_days_total)) %>%
+  mutate(common_name = factor(common_name, 
+                              levels = unique(common_name))) %>%
+  
   # plot
   ggplot(aes(x = site, y = common_name, fill = species_ARU_days)) +
   geom_tile() + 
   
   # fine tune
-  scale_x_discrete(guide = guide_axis(n.dodge = 3),
-                   position = "top") +
-  scale_fill_distiller(palette = "YlOrRd", direction = 1) +
+  scale_x_discrete(guide = guide_axis(n.dodge = 3), position = "top") +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1,
+                       guide = guide_colorbar(barwidth = 40, barheight = 0.8)) +
   
   # set theme
   theme_bw() +
-  labs(x = "Site", y = "Species") +
-  theme(legend.position = "right",
+  labs(x = "Site", y = "Species", fill = "Site by species ARU days") +
+  theme(legend.position = "bottom",
         axis.title = element_text(size = 16),
         axis.text = element_text(size = 12),
         axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
-        axis.title.x = element_text(margin = margin(t = 0, r = 0, b = 10, l = 0)))
+        axis.title.x = element_text(margin = margin(t = 0, r = 0, b = 10, l = 0)),
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size = 12))
 
-Hills_vis
+
+ggsave(plot = Hills_vis, 
+       filename = here("docs", "figures", "Hills_vis.png"),
+       width = 38,
+       height = 24,
+       units = "cm",
+       dpi = 300)
 
 
 
-# data formation for the iNEXT calculation  
+
+# iNEXT model and calculation  
 Hills_incidence_freq <- setNames(Hills$incidence_freq, Hills$site) 
 
-
-
-# richness plot & table
 iNEXT_richness_model <- iNEXT(Hills_incidence_freq, 
                               q = 0,
                               datatype = "incidence_freq")
 
+
+# iNEXT result shown by table
 iNEXT_richness_table <- iNEXT_richness_model$DataInfo %>%
   as_tibble() %>%
-  rename(site = Assemblage,
+  left_join(iNEXT_richness_model$AsyEst %>% 
+              filter(Diversity == "Species richness") %>%
+              rename(S.obs = Observed)) %>%
+  rename(site = Assemblage, 
          ARU_days = "T",
-         species_ARU_days = "U") %>%
-  select(site, ARU_days, species_ARU_days, S.obs, SC) %>%
-  left_join(ChaoRichness(Hills_incidence_freq, 
-                         datatype = "incidence_freq", 
-                         conf = 0.95) %>%
-              as_tibble(rownames = "site")) %>%
-  rename(observed = Observed,
-         estimated = Estimator,
-         est_se = Est_s.e.,
-         est_95_lower = `95% Lower`,
-         est_95_upper = `95% Upper`) %>%
+         species_ARU_days = "U", 
+         observed = "S.obs",
+         estimated = "Estimator",
+         bootstrap_se = "s.e.",
+         bootstrap_95_lower = LCL,
+         bootstrap_95_upper = UCL) %>%
   select(site, ARU_days, species_ARU_days, 
-         observed, estimated, est_se, est_95_lower, est_95_upper)
+         observed, estimated, 
+         bootstrap_se, bootstrap_95_lower, bootstrap_95_upper)
+  
+  
+  # rename(site = Assemblage,
+  #        ARU_days = "T",
+  #        species_ARU_days = "U") %>%
+  # select(site, ARU_days, species_ARU_days, S.obs, SC) %>%
+  # left_join(ChaoRichness(Hills_incidence_freq, 
+  #                        datatype = "incidence_freq", 
+  #                        conf = 0.95) %>%
+  #             as_tibble(rownames = "site")) %>%
+  # rename(observed = Observed,
+  #        estimated = Estimator,
+  #        est_se = Est_s.e.,
+  #        est_95_lower = `95% Lower`,
+  #        est_95_upper = `95% Upper`) %>%
+  # select(site, ARU_days, species_ARU_days, 
+  #        observed, estimated, est_se, est_95_lower, est_95_upper)
 
 
-
+# iNEXT result shown by plot
 iNEXT_richness_plot <- ggiNEXT(iNEXT_richness_model, 
                                type = 1,
-                               se = FALSE) + 
+                               se = FALSE) +
   labs(x = "ARU days", y = "# of species") +
+  scale_color_manual(values = rep("grey40", 59)) +  # set line color for 59 sites
+  scale_fill_manual(values = rep("grey80", 59)) +     # set ribbon fill for 59 sites
   
   # set theme
   theme_bw() +
   theme(legend.position = "none",
-        legend.position.inside = c(0.8, 0.2),
-        legend.text = element_text(size = 16),
         axis.title = element_text(size = 16),
         axis.text = element_text(size = 12),
         axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
         axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)))
+
+iNEXT_richness_plot$layers[[1]]$aes_params$size <- 0.2    # thinner lines
+iNEXT_richness_plot$layers[[2]]$aes_params$alpha <- 0.2
 
 iNEXT_richness_plot
 
@@ -392,6 +433,34 @@ ggplot() +
        title = 'Crown Closure above 10m (%)') +
   theme_bw()
 
+
+
+# old code for the general iNEXT curve ------------------------------------
+
+test <- bird_data_cleaned_target_threshold %>%
+  
+  filter(!site %in% c("14_27", "14_32", "N_02")) %>%
+  
+  mutate(date = date(datetime)) %>%
+  group_by(common_name) %>%
+  summarize(species_ARU_days = n_distinct(date, site)) 
+
+
+test_incidence <- c(sum(test$species_ARU_days, na.rm = TRUE), test$species_ARU_days)
+test_incidence <- setNames(test_incidence, c("Total", test$common_name))
+
+
+
+test_model <- iNEXT(test_incidence, 
+                    q = 0,
+                    datatype = "incidence_freq",
+                    endpoint = 300)
+
+test_plot <- ggiNEXT(test_model, 
+                     type = 1,
+                     se = FALSE)
+
+test_plot
 
 
 
