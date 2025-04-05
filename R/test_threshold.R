@@ -13,6 +13,7 @@ library(terra)
 library(stars)
 
 library(iNEXT)
+library(MuMIn)
 
 
 # functions ---------------------------------------------------------------
@@ -356,7 +357,7 @@ diversity_model_data <- iNEXT_richness_table %>%
   # mutate(bootstrap_est = runif(1, est_95_lower, est_95_upper)) %>%
   # ungroup() %>%
   left_join(cov_lidar, by = join_by(site)) %>%
-  select(estimated, est_se,
+  select(estimated,
          dem, slope, aspect, cc1_3, cc3_10, cc10, chm, vdi, vdi_95, 
          ba_dens_x100, dist_wet_lidar, d_vr_ipolyedge, 
          prop_decid_100m, age0_20_1000, site_class) 
@@ -365,18 +366,19 @@ diversity_model_data <- iNEXT_richness_table %>%
 
 # fit the full model and all the possible combinations of the variables
 predictor_vars <- diversity_model_data %>%
-  select(-c(1, 2)) %>%
+  select(-1) %>%
   #select(matches("_scaled")) %>%
   colnames() %>%
   paste(collapse = " + ") 
 
 
+# full model
 options(na.action = "na.fail")
 full <- lm(as.formula(paste("estimated", "~", predictor_vars)), 
                       data = diversity_model_data)
 
+# rest of all possible models
 res <- dredge(full, trace = 2)
-
 
 # model selection, which only keeps the model that reach <2 in delta AIC
 subset(res, delta <= 2, recalc.weights=FALSE)
