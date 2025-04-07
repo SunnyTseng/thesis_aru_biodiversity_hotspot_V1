@@ -21,6 +21,8 @@ load(here("data", "BirdNET_detections", "bird_data_cleaned_target.rda"))
 # bird detections for final list
 load(here("data", "BirdNET_detections", "bird_data_cleaned_target_threshold.rda"))
 
+# iNEXT richness
+load(here("data", "iNEXT model", "iNEXT_richness_model.rda"))
 
 
 
@@ -138,3 +140,32 @@ gtsave(data = species_table_threshold,
        filename = here("docs", "tables", "species_table_threshold.rtf"))
 
 
+
+
+# asymptotic richness for each site --------------------------------
+
+iNEXT_richness_table <- iNEXT_richness_model$DataInfo %>%
+  
+  # table arrangment
+  as_tibble() %>%
+  left_join(iNEXT_richness_model$AsyEst %>% 
+              filter(Diversity == "Species richness") %>%
+              rename(S.obs = Observed)) %>%
+  mutate(Estimator = round(Estimator, 2),
+         s.e. = round(s.e., 2)) %>%
+  select(Assemblage, "T", "U", 
+         "S.obs", "Estimator", "s.e.") %>%
+  arrange(T, U) %>%
+  
+  # make table
+  gt() %>%
+  cols_label(Assemblage = "Site",
+             "T" = "ARU days",
+             "U" = "Species ARU days",
+             "S.obs" = "No. species observed",
+             "Estimator" = "Asymptotic richness",
+             "s.e." = "Bootstrap SE") %>%
+  cols_align(align = "center") %>%
+  tab_options(table.font.size = 12) 
+  
+  
