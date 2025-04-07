@@ -22,7 +22,7 @@ load(here("data", "BirdNET_detections", "bird_data_cleaned_target.rda"))
 load(here("data", "BirdNET_detections", "bird_data_cleaned_target_threshold.rda"))
 
 # iNEXT richness
-load(here("data", "iNEXT model", "iNEXT_richness_model.rda"))
+load(here("data", "iNEXT_model", "iNEXT_richness_model.rda"))
 
 
 
@@ -146,7 +146,7 @@ gtsave(data = species_table_threshold,
 
 iNEXT_richness_table <- iNEXT_richness_model$DataInfo %>%
   
-  # table arrangment
+  # table arrangement
   as_tibble() %>%
   left_join(iNEXT_richness_model$AsyEst %>% 
               filter(Diversity == "Species richness") %>%
@@ -168,4 +168,9 @@ iNEXT_richness_table <- iNEXT_richness_model$DataInfo %>%
   cols_align(align = "center") %>%
   tab_options(table.font.size = 12) 
   
-  
+
+gtsave(data = iNEXT_richness_table,
+       filename = here("docs", "tables", "iNEXT_richness_table.rtf"))
+
+
+
