@@ -249,22 +249,34 @@ iNEXT_richness_model <- iNEXT(setNames(Hills$incidence_freq, Hills$site),
 
 # Method 1: build the GLM -------------------------------------------------
 
-diversity_model_data <- iNEXT_richness_model$DataInfo %>%
+# prepare the data for modelling
+diversity_model_data <- ChaoRichness(setNames(Hills$incidence_freq,
+                                              Hills$site), 
+                                     datatype = "incidence_freq") %>% 
   
-  # table arrangement
-  as_tibble() %>%
-  left_join(iNEXT_richness_model$AsyEst %>% 
-              filter(Diversity == "Species richness") %>%
-              rename(S.obs = Observed)) %>%
-  rename(site = Assemblage,
-         estimated = Estimator) %>%
+  # clean the table
+  as_tibble(rownames = "site") %>%
+  rename(observed = Observed,
+         estimated = Estimator,
+         LCL = `95% Lower`,
+         UCL = `95% Upper`) %>%
+  
+  # bootstrap random sampling for 50 between LCL and UCL -- > 
+  # concern: the probability distribution of the real estimate is not uniform 
+  # between LCL and UCL, thus, a raodom uniform sampling is not a good idea
+  
+  # crossing(bootstrap_id = 1:5) %>%
+  # rowwise() %>%
+  # mutate(estimated_bootstrap = runif(1, LCL, UCL)) %>%
+  # ungroup()
   
   # combine the LiDAR covariates 
   left_join(cov_lidar, by = join_by(site)) %>%
   select(estimated,
-         dem, slope, aspect, cc1_3, cc3_10, cc10, chm, vdi, vdi_95, 
-         ba_dens_x100, dist_wet_lidar, d_vr_ipolyedge, 
-         prop_decid_100m, age0_20_1000, site_class) 
+         dem, slope, aspect, dist_wet_lidar, d_vr_ipolyedge, 
+         cc1_3, cc3_10, cc10, chm, vdi_95, 
+         less10, age80, 
+         prop_decid_100m, decid_dens, conf_dens, tree_dens, ba_dens_x100) 
 
 
 # fit the full model and all the possible combinations of the variables
@@ -273,30 +285,100 @@ predictor_vars <- diversity_model_data %>%
   colnames() %>%
   paste(collapse = " + ") 
 
-
-# full model
 options(na.action = "na.fail")
 full <- lm(as.formula(paste("estimated", "~", predictor_vars)), 
                       data = diversity_model_data)
 
-# rest of all possible models
-res <- dredge(full, trace = 2)
+# all possible combinations of the variables
+res <- dredge(full, trace = 2) # started 11:10 
 
-# model selection, which only keeps the model that reach <2 in delta AIC
-subset(res, delta <= 2, recalc.weights = FALSE)
+# save(object = res,
+#      file = here("data", "iNEXT_model", "model_dredge_res.rda"))
+
 
 # get the importance of each of the variable by their sum of weights
-sw(res)
+importance_cov <- sw(res)
 
-# get the average of the model
-summary(model.avg(res))
+importance_cov_fig <- importance_cov %>% 
+  
+  # wrangle the data
+  enframe() %>% 
+  mutate(name = case_when(
+    name == "d_vr_ipolyedge" ~ "d_vri_polyedge",
+    name == "less10" ~ "less_10",
+    name == "age80" ~ "age_80",
+    name == "prop_decid_100m" ~ "prop_decid",
+    name == "ba_dens_x100" ~ "ba_dens",
+    .default = name)) %>%
+  mutate(important = if_else(value > 0.8, "Y", "N")) %>%
+  arrange(desc(value)) %>%
+  mutate(name = as_factor(name)) %>%
+  
+  # plot
+  ggplot(aes(x = name, y = value, fill = important)) +
+  geom_bar(stat = "identity") + 
+  geom_hline(yintercept = 0.8, linetype = "dashed", color = "red") +
+  
+  # fine tune
+  scale_x_discrete(guide = guide_axis(n.dodge = 3)) +
+  scale_fill_manual(values = c("Y" = "darkblue", "N" = "lightblue")) +
+  theme_bw() +
+  labs(x = "LiDAR covariates", y = "Sum of model weights") +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 12),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+        axis.title.x = element_text(margin = margin(t = 10, r = 0, b = , l = 0)))
 
+importance_cov_fig
 
+ggsave(plot = importance_cov_fig,
+       filename = here("docs", "figures", "importance_cov_fig.png"),
+       width = 18,
+       height = 12,
+       units = "cm",
+       dpi = 300)
 
 
 
 
 # Method 1: GLM model prediction ------------------------------------------
+
+# get the average of the model
+average_cov <- model.avg(res, subset = delta < 4)
+
+coefficient_plot <- ggcoef_model(average_cov)
+
+
+
+
+
+
+
+
+average_cov$coefficients[1,] %>% enframe() %>% rename(coefficient = value)
+
+intercept = 38.89 
+slope = -0.03896
+
+predicted <- intercept + 
+  slope * diversity_model_data$d_vr_ipolyedge
+
+estimated <- diversity_model_data$estimated
+
+
+test_1 <- tibble(predicted = predicted,
+                 estimated = estimated) %>%
+  ggplot(aes(y = estimated, x = predicted)) +
+  geom_point() + 
+  geom_abline(intercept = 0, slope = 1)
+
+test_1
+
+
+
+
+
 
 X.0 <- cov_prediction %>%
   mutate(cc10_scale = scale(cc10),

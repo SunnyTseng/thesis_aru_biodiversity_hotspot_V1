@@ -148,13 +148,17 @@ iNEXT_richness_table <- iNEXT_richness_model$DataInfo %>%
   
   # table arrangement
   as_tibble() %>%
-  left_join(iNEXT_richness_model$AsyEst %>% 
-              filter(Diversity == "Species richness") %>%
+  left_join(ChaoRichness(setNames(Hills$incidence_freq, Hills$site), 
+                         datatype = "incidence_freq") %>% 
+              as_tibble(rownames = "Assemblage") %>%
               rename(S.obs = Observed)) %>%
   mutate(Estimator = round(Estimator, 2),
-         s.e. = round(s.e., 2)) %>%
+         `95% Lower` = round(`95% Lower`, 2),
+         `95% Upper` = round(`95% Upper`, 2)) %>%
+  mutate(diff = paste0("+ ", round((Estimator - S.obs), 2))) %>%
+  
   select(Assemblage, "T", "U", 
-         "S.obs", "Estimator", "s.e.") %>%
+         S.obs, Estimator, diff, `95% Lower`, `95% Upper`) %>%
   arrange(T, U) %>%
   
   # make table
@@ -162,9 +166,11 @@ iNEXT_richness_table <- iNEXT_richness_model$DataInfo %>%
   cols_label(Assemblage = "Site",
              "T" = "ARU days",
              "U" = "Species ARU days",
-             "S.obs" = "No. species observed",
+             "S.obs" = "Observed richness",
              "Estimator" = "Asymptotic richness",
-             "s.e." = "Bootstrap SE") %>%
+             "diff" = "No. of species added",
+             "95% Lower" = "LCL",
+             "95% Upper" = "UCL") %>%
   cols_align(align = "center") %>%
   tab_options(table.font.size = 12) 
   
