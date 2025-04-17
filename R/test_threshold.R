@@ -273,7 +273,7 @@ diversity_model_data <- ChaoRichness(setNames(Hills$incidence_freq,
   # combine the LiDAR covariates 
   left_join(cov_lidar, by = join_by(site)) %>%
   select(estimated,
-         dem, slope, aspect, dist_wet_lidar, d_vr_ipolyedge, 
+         dem, slope, aspect, d_vr_ipolyedge, d_lid_rip_wet_str_le,
          cc1_3, cc3_10, cc10, chm, vdi_95, 
          less10, age80, 
          prop_decid_100m, decid_dens, conf_dens, tree_dens, ba_dens_x100) 
@@ -290,7 +290,7 @@ full <- lm(as.formula(paste("estimated", "~", predictor_vars)),
                       data = diversity_model_data)
 
 # all possible combinations of the variables
-res <- dredge(full, trace = 2) # started 11:10 
+res <- dredge(full, trace = 2)
 
 # save(object = res,
 #      file = here("data", "iNEXT_model", "model_dredge_res.rda"))
@@ -334,7 +334,7 @@ importance_cov_fig
 
 ggsave(plot = importance_cov_fig,
        filename = here("docs", "figures", "importance_cov_fig.png"),
-       width = 18,
+       width = 20,
        height = 12,
        units = "cm",
        dpi = 300)
@@ -345,7 +345,9 @@ ggsave(plot = importance_cov_fig,
 # Method 1: GLM model prediction ------------------------------------------
 
 # get the average of the model
-average_cov <- model.avg(res, subset = delta < 4)
+average_cov <- model.avg(res)
+
+summary(average_cov)
 
 coefficient_plot <- ggcoef_model(average_cov)
 
