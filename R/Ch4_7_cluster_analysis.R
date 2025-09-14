@@ -3,13 +3,22 @@
 ### Purpose: Which bird species occur on the same sites? 
 
 
+
+# library -----------------------------------------------------------------
+
 library(tidyverse)
 library(here)
+library(factoextra)
+library(cluster)
+library(ggplot2)
 
+
+
+# load data ---------------------------------------------------------------
 
 load(here("data", "iNEXT_model", "Hills.rda"))
 
-test <- Hills %>%
+data <- Hills %>%
   
   # arrange the columns
   select(-incidence_freq) %>%
@@ -25,69 +34,53 @@ test <- Hills %>%
               values_fill = 0) 
 
 
-# Again, subset the data to retain just the bird info.
-justx <- test[,-1] 
-#rownames(justx) <- test$common_name
-n <- nrow(justx)
-
-## calculate the within sums of squares (wss) for 1 to 6 clusters
-wss <- rep(0, 6)
-# calculate the wss when only having 1 cluster 
-wss[1] <- (n - 1) * sum(sapply(justx, var)) 
-# calculate wss when having 2 to 6 clusters for k-means
-for (i in 2:6)
-  wss[i] <- sum(kmeans(justx, centers = i)$withinss)
-
-# print out the wss for each scenario
-plot(1:6, wss, type = "b", xlab = "Number of groups",
-     ylab = "Within groups sum of squares")
+data_cluster <- data %>%
+  as.data.frame() %>%
+  column_to_rownames(common_name)
 
 
 
-## 3 groups
-(threegroups <- kmeans(justx, centers = 3))
+# find number of cluster --------------------------------------------------
 
-str(threegroups) # includes the cluster no, etc.
-Keep3<-data.frame(justx,as.factor(threegroups$cluster) )
-head(Keep3) # cluster number is added to the data.
-summary(Keep3) # most are in Cluster 1 here.
+# total within sum of squares
+fviz_nbclust(data_cluster, kmeans, method = "wss")
+# looks like 3 or 6 clusters
 
-## 4 groups
-(fourgroups <- kmeans(justx, centers = 4))
+# gap statistic
+gap_stat <- clusGap(data_cluster, FUN = kmeans, nstart = 25, K.max = 10, B = 50)
+fviz_gap_stat(gap_stat)
+# looks like 6 clusters could be the best
 
-str(fourgroups) # includes the cluster no, etc.
-Keep4<-data.frame(justx,as.factor(fourgroups$cluster) )
-head(Keep4) # cluster number is added to the data.
-summary(Keep4)
 
-## 
-colorlow <- rainbow(3)[threegroups$cluster]
-colorup <- rainbow(4)[fourgroups$cluster]
-panel.up <- function(x, y, ...)
-{ # function to produce scatterplot in pairs()
-  usr <- par("usr") # save par() values
-  on.exit(par(usr)) # set par() at end
-  par(usr = c(max(y), min(y), max(x), min(x))) # set bounds
-  points(y, x, col = colorup, pch = 16) # plot data points
-}
-pairs(justx, pch = 16, gap = 0, xaxt = "n", yaxt = "n",
-      col = colorlow, upper.panel = panel.up)
 
-##
-dim(Keep4)
-summary(Keep4)
 
-cluster1<-Keep4[(Keep4$as.factor.fourgroups.cluster==1),]
-cluster2<-Keep4[(Keep4$as.factor.fourgroups.cluster==2),]
-cluster3<-Keep4[(Keep4$as.factor.fourgroups.cluster==3),]
-cluster4<-Keep4[(Keep4$as.factor.fourgroups.cluster==4),]
+# k-means clustering ------------------------------------------------------
+set.seed(1)
 
-dim(cluster1)
-dim(cluster2)
-dim(cluster3)
-dim(cluster4)
+km <- kmeans(data_cluster, centers = 3)
 
-rownames(cluster1) # what birds in cluster 1? 
-rownames(cluster2)
-rownames(cluster3)
-rownames(cluster4)
+species_cluster <- fviz_cluster(km, data = data_cluster, 
+             repel = TRUE,
+             show.clust.cent = FALSE,
+             shape = 16,
+             main = NULL,
+             xlab = "PC1",
+             ylab = "PC2") +
+  
+  xlim(-18, 12) +
+  ylim(-6, 7) +
+  scale_color_brewer(palette = "Dark2") +
+  scale_fill_brewer(palette = "Dark2") +
+  
+  theme_bw() +
+  theme(axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.position = "none")
+
+
+ggsave(plot = species_cluster,
+       filename = here("docs", "figures", "species_cluster.png"),
+       width = 25,
+       height = 12,
+       units = "cm",
+       dpi = 300)
