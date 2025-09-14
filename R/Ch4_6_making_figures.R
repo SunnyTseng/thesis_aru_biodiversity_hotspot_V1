@@ -5,6 +5,7 @@
 library(tidyverse)
 library(here)
 library(patchwork)
+library(iNEXT)
 
 
 # data import -------------------------------------------------------------
@@ -43,6 +44,9 @@ Hills_vis <- Hills %>%
   theme(legend.position = "bottom",
         axis.title = element_text(size = 16),
         axis.text = element_text(size = 12),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        
         axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
         axis.title.x = element_text(margin = margin(t = 0, r = 0, b = 10, l = 0)),
         legend.title = element_text(size = 16),

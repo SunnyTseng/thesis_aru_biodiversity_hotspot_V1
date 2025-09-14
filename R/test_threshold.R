@@ -210,7 +210,10 @@ bird_data_cleaned_target_threshold <- bird_data_cleaned_target %>%
 #      file = here("data", "BirdNET_detections",
 #                  "bird_data_cleaned_target_threshold.rda"))
 
-# Method 1: get the Hill number of each site ------------------------------
+
+
+
+# Method 0: get the Hill number of each site ------------------------------
 
 
 # general data summary 
