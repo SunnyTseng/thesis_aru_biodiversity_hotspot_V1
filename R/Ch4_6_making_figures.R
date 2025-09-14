@@ -102,19 +102,19 @@ Hills_curves <- Hills %>%
 Hills_curves_low <- Hills_curves$plot[[2]] + 
   geom_text(label = "0 - 90 days", x = 130, y = 5, size = 6)
 Hills_curves_low$layers[[1]]$aes_params$size <- 0.2
-Hills_curves_low$layers[[2]]$aes_params$alpha <- 0.4
+Hills_curves_low$layers[[2]]$aes_params$alpha <- 0.7
 
 # medium
 Hills_curves_medium <- Hills_curves$plot[[3]] + 
   geom_text(label = "90 - 120 days", x = 120, y = 5, size = 6)
 Hills_curves_medium$layers[[1]]$aes_params$size <- 0.2
-Hills_curves_medium$layers[[2]]$aes_params$alpha <- 0.4
+Hills_curves_medium$layers[[2]]$aes_params$alpha <- 0.7
 
 # high
 Hills_curves_high <- Hills_curves$plot[[1]] + 
   geom_text(label = "> 120 days", x = 130, y = 5, size = 6)
 Hills_curves_high$layers[[1]]$aes_params$size <- 0.2
-Hills_curves_high$layers[[2]]$aes_params$alpha <- 0.4
+Hills_curves_high$layers[[2]]$aes_params$alpha <- 0.7
 
 
 Hills_curves_low
