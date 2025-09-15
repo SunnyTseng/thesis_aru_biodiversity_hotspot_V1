@@ -66,17 +66,16 @@ species_cluster <- fviz_cluster(km, data = data_cluster,
              main = NULL,
              xlab = "PC1",
              ylab = "PC2") +
-  
+  # fine tune
   xlim(-18, 12) +
   ylim(-6, 7) +
   scale_color_brewer(palette = "Dark2") +
   scale_fill_brewer(palette = "Dark2") +
-  
+  # set the theme
   theme_bw() +
   theme(axis.title = element_text(size = 14),
         axis.text = element_text(size = 12),
         legend.position = "none")
-
 
 ggsave(plot = species_cluster,
        filename = here("docs", "figures", "species_cluster.png"),
@@ -84,3 +83,8 @@ ggsave(plot = species_cluster,
        height = 12,
        units = "cm",
        dpi = 300)
+
+
+# interpretation ----------------------------------------------------------
+
+data_final <- c
