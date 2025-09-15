@@ -323,7 +323,7 @@ importance_cov_fig <- importance_cov %>%
   geom_hline(yintercept = 0.8, linetype = "dashed", color = "red") +
   
   # fine tune
-  scale_x_discrete(guide = guide_axis(n.dodge = 3)) +
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
   scale_fill_manual(values = c("Y" = "darkblue", "N" = "lightblue")) +
   theme_bw() +
   labs(x = "LiDAR covariates", y = "Sum of model weights") +
@@ -338,7 +338,7 @@ importance_cov_fig
 ggsave(plot = importance_cov_fig,
        filename = here("docs", "figures", "importance_cov_fig.png"),
        width = 20,
-       height = 12,
+       height = 15,
        units = "cm",
        dpi = 300)
 
