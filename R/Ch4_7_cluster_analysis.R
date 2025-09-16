@@ -36,7 +36,7 @@ data <- Hills %>%
 
 data_cluster <- data %>%
   as.data.frame() %>%
-  column_to_rownames(common_name)
+  column_to_rownames("common_name")
 
 
 
