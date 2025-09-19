@@ -112,10 +112,13 @@ cov_1 <- rast(here("data", "JPRF_lidar_2015", "JPRF_veg_Lidar_2015_raw",
 cov_2 <- rast(here("data", "JPRF_lidar_2015", "JPRF_veg_Lidar_2015_raw", 
                    "vdr95.tif"))
 
-cov_prediction <- c(cov_1, cov_2) %>%
+cov_3 <- rast(here("data", "JPRF_lidar_2015_target_layer", "lidst_le_dis2"))
+
+cov_prediction <- c(cov_1, cov_2, cov_3) %>%
   as.data.frame(xy = TRUE) %>%
   as_tibble() %>%
-  rename(cc10 = Crown_Closure_above_10m_zero1, VDI = vdr95)
+  rename(cc10 = Crown_Closure_above_10m_zero1, vdi_95 = vdr95,
+         d_lid_rip_wet_str_le = lidst_le_dis2)
 
 
 # get the threshold for each species -------------------------------------
@@ -250,7 +253,8 @@ iNEXT_richness_model <- iNEXT(setNames(Hills$incidence_freq, Hills$site),
 
 
 
-# Method 1: build the GLM -------------------------------------------------
+
+# Step 1: Variable selection ----------------------------------------------
 
 # prepare the data for modelling
 diversity_model_data <- ChaoRichness(setNames(Hills$incidence_freq,
@@ -302,6 +306,18 @@ res <- dredge(full, trace = 2)
 # get the importance of each of the variable by their sum of weights
 importance_cov <- sw(res)
 
+
+# get the average of the model
+average_cov <- model.avg(res)
+
+summary(average_cov)
+
+average_cov$coefficients[1,] %>% enframe() %>% rename(coefficient = value)
+
+coefficient_plot <- ggcoef_model(average_cov)
+
+
+# model weight plot
 importance_cov_fig <- importance_cov %>% 
   
   # wrangle the data
@@ -345,63 +361,55 @@ ggsave(plot = importance_cov_fig,
 
 
 
-# Method 1: GLM model prediction ------------------------------------------
 
-# get the average of the model
-average_cov <- model.avg(res)
+# Step 2: Build linear model for prediction -------------------------------
 
-summary(average_cov)
+# build some candidate models based on the importance of the variables
+model_1 <- lm(estimated ~ d_lid_rip_wet_str_le, 
+             data = diversity_model_data)
 
-coefficient_plot <- ggcoef_model(average_cov)
+model_2 <- lm(estimated ~ d_lid_rip_wet_str_le + aspect, 
+             data = diversity_model_data)
 
+model_3<- lm(estimated ~ d_lid_rip_wet_str_le + aspect + cc1_3, 
+            data = diversity_model_data)
 
+# model selection
+summary(model_1)
+summary(model_2) 
+summary(model_3)
 
-
-
-
-
-
-average_cov$coefficients[1,] %>% enframe() %>% rename(coefficient = value)
-
-intercept = 38.89 
-slope = -0.03896
-
-predicted <- intercept + 
-  slope * diversity_model_data$d_vr_ipolyedge
-
-estimated <- diversity_model_data$estimated
-
-
-test_1 <- tibble(predicted = predicted,
-                 estimated = estimated) %>%
-  ggplot(aes(y = estimated, x = predicted)) +
-  geom_point() + 
-  geom_abline(intercept = 0, slope = 1)
-
-test_1
+AIC(model_1) # lowest AIC, prioritize simplicity and AIC for predictive power
+AIC(model_2)
+AIC(model_3) 
 
 
 
+# predict the richness within the dataset
+richness_site_pred <- diversity_model_data %>%
+  mutate(predicted = predict(model_1, ., type = "response"))
+
+ggplot(data = richness_site_pred, 
+       aes(x = d_lid_rip_wet_str_le, y = estimated)) +
+  geom_point() +
+  #geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") +
+  labs(x = "Distance to stream, wetland, and lake edge", y = "Asymptotic richness") +
+  theme_bw()
 
 
+# predict the richness across the whole landscape
+richness_map_pred <- predict(model_1, cov_prediction, type = "response")
 
-X.0 <- cov_prediction %>%
-  mutate(cc10_scale = scale(cc10),
-         VDI_scale = scale(VDI)) 
+richness_map_pred_1 <- richness_map_pred %>%
+  pmax(0) %>%  # set negative values to 0
+  round()      # round to the nearest integer
 
-richness_pred <- predict(model, X.0, type = "response")
+richness_map_vis <- data.frame(x = cov_prediction$x, 
+                               y = cov_prediction$y, 
+                               richness = richness_map_pred_1)
 
-
-
-# Make a species richness map based on predicted values
-richness_vis <- data.frame(x = cov_prediction$x, 
-                           y = cov_prediction$y, 
-                           richness = richness_pred)
-
-
-dat.stars <- richness_vis %>%
+dat.stars <- richness_map_vis %>%
   st_as_stars(dims = c('x', 'y'))
-
 
 ggplot() + 
   geom_stars(data = dat.stars, aes(x = x, y = y, 
@@ -414,14 +422,5 @@ ggplot() +
        fill = 'Richness', title = 'Predicted asymptotic richness') +
   theme_bw()
 
-
-
-# plot the cov_prediction
-ggplot() + 
-  geom_raster(data = cov_prediction, aes(x = x, y = y, fill = cc10)) +
-  scale_fill_viridis_c(option = "plasma") +
-  labs(x = 'Easting', y = 'Northing', fill = '', 
-       title = 'Crown Closure above 10m (%)') +
-  theme_bw()
 
 
