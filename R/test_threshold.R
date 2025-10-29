@@ -364,9 +364,14 @@ ggsave(plot = importance_cov_fig,
 
 # Step 2: Build linear model for prediction -------------------------------
 
+
 # build some candidate models based on the importance of the variables
 model_1 <- lm(estimated ~ d_lid_rip_wet_str_le, 
              data = diversity_model_data)
+
+loess_mod <- loess(estimated ~ d_lid_rip_wet_str_le, 
+                   data = richness_site_pred, 
+                   span = 1)  # same span as in your plot
 
 model_2 <- lm(estimated ~ d_lid_rip_wet_str_le + aspect, 
              data = diversity_model_data)
@@ -385,20 +390,33 @@ AIC(model_3)
 
 
 
-# predict the richness within the dataset
-richness_site_pred <- diversity_model_data %>%
-  mutate(predicted = predict(model_1, ., type = "response"))
+# Step 3: Prediction and visualization ------------------------------------
 
-ggplot(data = richness_site_pred, 
+# Create a data frame for prediction
+richness_site_pred <- diversity_model_data %>%
+  mutate(pred_lm = predict(model_1),
+         pred_loess = predict(loess_mod))
+
+
+# Plot
+ggplot(richness_site_pred, 
        aes(x = d_lid_rip_wet_str_le, y = estimated)) +
   geom_point() +
-  #geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") +
-  labs(x = "Distance to stream, wetland, and lake edge", y = "Asymptotic richness") +
+  geom_smooth(method = "loess",   
+              span = 1,          
+              formula = y ~ x, 
+              color = "blue", se = TRUE) +
+  labs(x = "Distance to stream, wetland, and lake edge (m)", 
+       y = "Asymptotic richness") +
   theme_bw()
 
 
+
+# Step 4: Prediction across the JPRF region -------------------------------
+
+
 # predict the richness across the whole landscape
-richness_map_pred <- predict(model_1, cov_prediction, type = "response")
+richness_map_pred <- predict(loess_mod, cov_prediction, type = "response")
 
 richness_map_pred_1 <- richness_map_pred %>%
   pmax(0) %>%  # set negative values to 0
