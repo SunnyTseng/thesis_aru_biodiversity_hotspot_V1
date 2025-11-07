@@ -59,6 +59,8 @@ set.seed(1)
 
 km <- kmeans(data_cluster, centers = 3)
 
+#save(km, file = here("data", "clustering", "kmeans_species_cluster_3.rda"))
+
 species_cluster <- fviz_cluster(km, data = data_cluster, 
              repel = TRUE,
              show.clust.cent = FALSE,
@@ -77,6 +79,9 @@ species_cluster <- fviz_cluster(km, data = data_cluster,
         axis.text = element_text(size = 12),
         legend.position = "none")
 
+
+
+
 ggsave(plot = species_cluster,
        filename = here("docs", "figures", "species_cluster.png"),
        width = 25,
@@ -85,6 +90,3 @@ ggsave(plot = species_cluster,
        dpi = 300)
 
 
-# interpretation ----------------------------------------------------------
-
-data_final <- c

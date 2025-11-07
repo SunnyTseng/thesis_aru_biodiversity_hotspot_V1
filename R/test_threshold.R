@@ -68,7 +68,6 @@ data_validation_cleaned <- data_validation %>%
                                 validation == "U" ~ -1))
 
 
-
 # full dataset
 load(here("data", "BirdNET_detections", "bird_data_cleaned_target.rda"))
 
@@ -119,6 +118,11 @@ cov_prediction <- c(cov_1, cov_2, cov_3) %>%
   as_tibble() %>%
   rename(cc10 = Crown_Closure_above_10m_zero1, vdi_95 = vdr95,
          d_lid_rip_wet_str_le = lidst_le_dis2)
+
+
+# Hill data after summarized
+
+load(here("data", "iNEXT_model", "Hills.rda"))
 
 
 # get the threshold for each species -------------------------------------
@@ -259,7 +263,7 @@ iNEXT_richness_model <- iNEXT(setNames(Hills$incidence_freq, Hills$site),
 # prepare the data for modelling
 diversity_model_data <- ChaoRichness(setNames(Hills$incidence_freq,
                                               Hills$site), 
-                                     datatype = "incidence_freq") %>% 
+                                     datatype = "incidence_freq") %>%
   
   # clean the table
   as_tibble(rownames = "site") %>%
@@ -268,27 +272,84 @@ diversity_model_data <- ChaoRichness(setNames(Hills$incidence_freq,
          LCL = `95% Lower`,
          UCL = `95% Upper`) %>%
   
-  # bootstrap random sampling for 50 between LCL and UCL -- > 
-  # concern: the probability distribution of the real estimate is not uniform 
-  # between LCL and UCL, thus, a raodom uniform sampling is not a good idea
-  
-  # crossing(bootstrap_id = 1:5) %>%
-  # rowwise() %>%
-  # mutate(estimated_bootstrap = runif(1, LCL, UCL)) %>%
-  # ungroup()
+  # filter out the sites with low estimated richness
+  filter(estimated > 20) %>%
   
   # combine the LiDAR covariates 
   left_join(cov_lidar, by = join_by(site)) %>%
-  select(estimated,
+  
+  # check the transformation
+  mutate(d_vr_ipolyedge = log(d_vr_ipolyedge + 0.0001),
+         d_lid_rip_wet_str_le = log(d_lid_rip_wet_str_le + 0.0001),
+         dem = log(dem + 0.0001),
+         less10 = log(less10 + 0.0001),
+         slope = log(slope + 0.0001)) %>%
+  
+  # final selection
+  select(site, observed, estimated,
          dem, slope, aspect, d_vr_ipolyedge, d_lid_rip_wet_str_le,
          cc1_3, cc3_10, cc10, chm, vdi_95, 
          less10, age80, 
          prop_decid_100m, decid_dens, conf_dens, tree_dens, ba_dens_x100) 
 
 
+
+
+# Check which vaariable needs transformation
+
+# Select predictors + response
+plot_data <- diversity_model_data %>%
+  select(estimated, dem, slope, aspect, d_vr_ipolyedge, d_lid_rip_wet_str_le,
+         cc1_3, cc3_10, cc10, chm, vdi_95, less10, age80,
+         prop_decid_100m, decid_dens, conf_dens, tree_dens, ba_dens_x100)
+
+# Make all predictors long for facet plotting
+plot_data_long <- plot_data %>%
+  pivot_longer(-estimated, names_to = "predictor", values_to = "value")
+
+# Faceted scatterplots with trend lines
+ggplot(plot_data_long, aes(x = value, y = estimated)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "loess", se = FALSE, color = "red") +
+  facet_wrap(~ predictor, scales = "free_x") +
+  theme_minimal(base_size = 12)
+
+
+
+
+
+# visualization of site richness ------------------------------------------
+
+# First, order sites by observed richness
+plot_data <- diversity_model_data %>%
+  arrange(desc(observed)) %>%
+  mutate(site = factor(site, levels = site))  # preserve order for ggplot
+
+# Plot observed and estimated
+ggplot(plot_data, aes(x = site)) +
+  geom_point(aes(y = observed, color = "Observed"), size = 2) +
+  geom_point(aes(y = estimated, color = "Estimated"), size = 2) +
+  scale_color_manual(values = c("Observed" = "#1b9e77", "Estimated" = "#d95f02")) +
+  labs(x = "Site (ranked by observed richness)",
+       y = "Species richness",
+       color = "Type") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+
+
+
+
+
+
+
+
+
 # fit the full model and all the possible combinations of the variables
 predictor_vars <- diversity_model_data %>%
-  select(-1) %>%
+  select(-1, -2, -3) %>%
   colnames() %>%
   paste(collapse = " + ") 
 
@@ -366,17 +427,13 @@ ggsave(plot = importance_cov_fig,
 
 
 # build some candidate models based on the importance of the variables
-model_1 <- lm(estimated ~ d_lid_rip_wet_str_le, 
+model_1 <- lm(estimated ~ aspect, 
              data = diversity_model_data)
 
-loess_mod <- loess(estimated ~ d_lid_rip_wet_str_le, 
-                   data = richness_site_pred, 
-                   span = 1)  # same span as in your plot
-
-model_2 <- lm(estimated ~ d_lid_rip_wet_str_le + aspect, 
+model_2 <- lm(estimated ~ aspect + d_vr_ipolyedge, 
              data = diversity_model_data)
 
-model_3<- lm(estimated ~ d_lid_rip_wet_str_le + aspect + cc1_3, 
+model_3<- lm(estimated ~ aspect + d_vr_ipolyedge + cc1_3, 
             data = diversity_model_data)
 
 # model selection
@@ -384,7 +441,7 @@ summary(model_1)
 summary(model_2) 
 summary(model_3)
 
-AIC(model_1) # lowest AIC, prioritize simplicity and AIC for predictive power
+AIC(model_1)
 AIC(model_2)
 AIC(model_3) 
 
