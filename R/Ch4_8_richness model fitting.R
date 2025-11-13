@@ -12,8 +12,11 @@ library(here)
 library(scales)
 library(terra)
 library(stars)
-library(corrplot)
+library(ggcorrplot2)
+library(patchwork)
+library(car) # for VIF calculation
 
+library(psych) # for correlation calculation
 library(iNEXT)
 library(MuMIn)
 
@@ -26,7 +29,7 @@ load(here("data", "BirdNET_detections",
 load(here("data", "clustering", 
           "kmeans_species_cluster_3.rda"))
 
-species_clusters <- data.frame(common_name = rownames(data_cluster),
+species_clusters <- data.frame(common_name = names(km$cluster),
                                cluster = km$cluster)
 
 bird_data_clustered <- bird_data_cleaned_target_threshold %>%
@@ -50,7 +53,14 @@ cov_lidar <- read_xlsx(here("data", "JPRF_lidar_2015",
                             "JPRF_veg_Lidar_2015_summarized.xlsx"), 
                        sheet = "100") %>%
   clean_names() %>%
-  mutate(site = str_replace(site, "^N(\\d+)", "N_\\1"))
+  mutate(site = str_replace(site, "^N(\\d+)", "N_\\1")) %>%
+  rename(
+    d_vri_polyedge = d_vr_ipolyedge,
+    less_10 = less10,
+    age_80 = age80,
+    prop_decid = prop_decid_100m,
+    ba_dens = ba_dens_x100
+  )
 
 
 
@@ -58,7 +68,7 @@ cov_lidar <- read_xlsx(here("data", "JPRF_lidar_2015",
 
 # general data summary 
 Hills <- bird_data_clustered %>%
-  #filter(cluster == 2) %>%
+  #filter(cluster == 1) %>%
   
   # data wrangling
   mutate(date = date(datetime)) %>%
@@ -93,64 +103,131 @@ diversity_model_data <- ChaoRichness(setNames(Hills$incidence_freq,
   left_join(cov_lidar, by = join_by(site)) %>%
   
   # check the transformation
-  mutate(d_vr_ipolyedge = log(d_vr_ipolyedge + 0.1),
+  mutate(d_vri_polyedge = log(d_vri_polyedge + 0.1),
          d_lid_rip_wet_str_le = log(d_lid_rip_wet_str_le + 0.1),
          dem = log(dem + 0.1),
-         less10 = log(less10 + 0.1),
+         less_10 = log(less_10 + 0.1),
          slope = log(slope + 0.1)) %>%
   mutate(aspect_sin = sin(aspect * pi / 180),
          aspect_cos = cos(aspect * pi / 180)) %>%
   
   # final selection
-  select(site, observed, estimated,
-         dem, slope, aspect_sin, aspect_cos, d_vr_ipolyedge, d_lid_rip_wet_str_le, 
-         cc10, #chm, tree_dens, ba_dens_x100,
-         prop_decid_100m, #decid_dens,
-         cc3_10, #vdi_95, #cc1_3, less10, 
-         age80 #, conf_dens
-         ) 
+  select(site, observed, estimated, aspect_sin, aspect_cos,
+         dem, slope, aspect, d_lid_rip_wet_str_le, d_vri_polyedge, 
+         cc1_3, cc3_10, cc10, chm, vdi_95,
+         less_10, age_80, prop_decid, decid_dens, conf_dens, tree_dens, ba_dens) 
 
-# , chm, cc10, ba_dens_x100, tree_dens, cc1_3, vdi_95, conf_dens
-
-
+#
 
 # exploratory data analysis -----------------------------------------------
 
-# check correlation
-diversity_model_data %>%
-  select(-1, -2, -3) %>%
-  cor(use = "complete.obs") %>%
-  corrplot(., method = "color", type = "upper",
-         tl.col = "black", tl.srt = 45, addCoef.col = "black",
-         number.cex = 0.6)
+### check correlation - full
+ct <- diversity_model_data %>%
+  select(dem, slope, aspect, d_lid_rip_wet_str_le, d_vri_polyedge, 
+         cc1_3, cc3_10, cc10, chm, vdi_95,
+         less_10, age_80, prop_decid, decid_dens, conf_dens, tree_dens, ba_dens) %>%
+  corr.test(adjust = "none")
 
-# check VIFs for correlation
-lm_vif_filtered <- lm(estimated ~ dem + slope + aspect_sin + aspect_cos + d_vr_ipolyedge + 
-                        d_lid_rip_wet_str_le +
-                        cc10 + cc3_10 + prop_decid_100m + age80,
+c.mat <- ct$r
+p.mat <- ct$p
+
+colnames(c.mat) <- c("dem", "slope", "aspect", "d_lid", "d_vri", 
+                     "cc1_3", "cc3_10", "cc10", "chm", "vdi95",
+                     "lt10", "age80", "prop_decid", "dec_dens", 
+                     "conf_dens", "tree_dens", "ba_dens")
+
+# visualization
+var_selec_1 <- ggcorrplot.mixed(c.mat, 
+                 upper = "ellipse", lower = "number", 
+                 p.mat = p.mat, 
+                 insig = "blank") +
+  theme(legend.position = "none")
+
+# save the figure
+ggsave(plot = var_selec_1,
+       filename = here("docs", "figures", "fig_var_selec_1.png"),
+       width = 16,
+       height = 16,
+       units = "cm",
+       dpi = 300)
+
+
+### check correlation - after selection
+ct <- diversity_model_data %>%
+  select(dem, slope, aspect, d_lid_rip_wet_str_le, d_vri_polyedge, 
+         cc1_3, cc3_10, cc10,
+         age_80, prop_decid) %>%
+  corr.test(adjust = "none")
+
+c.mat <- ct$r
+p.mat <- ct$p
+
+colnames(c.mat) <- c("dem", "slope", "aspect", "d_lid", "d_vri", 
+                     "cc1_3", "cc3_10", "cc10", 
+                     "age80", "prop_decid")
+
+# visualization
+var_selec_2 <- ggcorrplot.mixed(c.mat, 
+                 upper = "ellipse", lower = "number", 
+                 p.mat = p.mat, 
+                 insig = "blank") +
+  theme(legend.position = "none")
+
+# save the figure
+ggsave(plot = var_selec_2,
+       filename = here("docs", "figures", "fig_var_selec_2.png"),
+       width = 14,
+       height = 14,
+       units = "cm",
+       dpi = 300)
+
+
+### check VIFs for correlation
+lm_vif_filtered <- lm(estimated ~ dem + slope + aspect + 
+                        d_lid_rip_wet_str_le + d_vri_polyedge + 
+                        cc1_3 + cc3_10 + cc10 +
+                        age_80 + prop_decid,
                       data = diversity_model_data)
-vif(lm_vif_filtered)
+
+vif_values <- vif(lm_vif_filtered) %>%
+  enframe(name = "Variable", value = "VIF")
+
+# plot the VIF values
+var_selec_3 <- ggplot(vif_values) +
+  geom_col(aes(x = reorder(Variable, VIF), 
+               y = VIF),
+           fill = "#7A8B8B") +
+  geom_hline(yintercept = 5, linetype = "dashed", 
+             color = "red", size = 1.5) +
+  
+  # fine tune
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
+  labs(x = NULL, y = "VIF") +
+  
+  # theme
+  theme_minimal(base_size = 13) + 
+  theme(axis.title = element_text(size = 16),
+        axis.text = element_text(size = 12),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)))
 
 
-# check for potential transformation
-plot_data <- diversity_model_data %>%
-  select(-1, -2)
-
-# Make all predictors long for facet plotting
-plot_data_long <- plot_data %>%
-  pivot_longer(-estimated, names_to = "predictor", values_to = "value")
-
-# Faceted scatterplots with trend lines
-ggplot(plot_data_long, aes(x = value, y = estimated)) +
-  geom_point(alpha = 0.6) +
-  geom_smooth(method = "loess", se = FALSE, color = "red") +
-  facet_wrap(~ predictor, scales = "free_x") +
-  theme_minimal(base_size = 12)
-
+# save the figure
+ggsave(plot = var_selec_3,
+       filename = here("docs", "figures", "fig_var_selec_3.png"),
+       width = 15,
+       height = 9,
+       units = "cm",
+       dpi = 300)
 
 
 
 # variable selection ------------------------------------------------------
+
+diversity_model_data <- diversity_model_data %>%
+select(site, observed, estimated,
+       dem, slope, aspect_sin, aspect_cos, d_lid_rip_wet_str_le, d_vri_polyedge, 
+       cc1_3, cc3_10, cc10,
+       age_80, prop_decid) 
 
 
 # fit the full model and all the possible combinations of the variables
@@ -166,30 +243,23 @@ full <- lm(as.formula(paste("estimated", "~", predictor_vars)),
 # all possible combinations of the variables
 res <- dredge(full, trace = 2)
 
-# save(object = res,
-#      file = here("data", "iNEXT_model", "model_dredge_res.rda"))
-
-
 # get the importance of each of the variable by their sum of weights
 importance_cov <- sw(res)
 
 
-
 # model weight plot
-importance_cov_fig <- importance_cov %>% 
+importance_cov_all <- importance_cov %>% 
   
   # wrangle the data
   enframe() %>% 
-  mutate(name = case_when(
-    name == "d_vr_ipolyedge" ~ "d_vri_polyedge",
-    name == "less10" ~ "less_10",
-    name == "age80" ~ "age_80",
-    name == "prop_decid_100m" ~ "prop_decid",
-    name == "ba_dens_x100" ~ "ba_dens",
-    .default = name)) %>%
   mutate(important = if_else(value > 0.8, "Y", "N")) %>%
-  arrange(desc(value)) %>%
   mutate(name = as_factor(name)) %>%
+  
+  # set factor levels explicitly
+  mutate(name = factor(name, levels = c("dem", "slope", "aspect_sin", "aspect_cos", 
+                                        "d_lid_rip_wet_str_le", "d_vri_polyedge", 
+                                        "cc1_3", "cc3_10", "cc10",
+                                        "age_80", "prop_decid"))) %>%
   
   # plot
   ggplot(aes(x = name, y = value, fill = important)) +
@@ -198,7 +268,7 @@ importance_cov_fig <- importance_cov %>%
   
   # fine tune
   scale_x_discrete(guide = guide_axis(angle = 45)) +
-  scale_fill_manual(values = c("Y" = "darkblue", "N" = "lightblue")) +
+  scale_fill_manual(values = c("Y" = "#8B5742", "N" = "grey")) +
   theme_bw() +
   labs(x = "LiDAR covariates", y = "Sum of model weights") +
   theme(legend.position = "none",
@@ -207,12 +277,97 @@ importance_cov_fig <- importance_cov %>%
         axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
         axis.title.x = element_text(margin = margin(t = 10, r = 0, b = , l = 0)))
 
-importance_cov_fig
+
+
+importance_cov_all
+importance_cov_purple
+importance_cov_orange
+importance_cov_green
+
 
 # save the figure
-ggsave(plot = importance_cov_fig,
-       filename = here("docs", "figures", "fig_cov_all_species.png"),
-       width = 20,
-       height = 15,
+ggsave(plot = importance_cov_purple,
+       filename = here("docs", "figures", "importance_cov_purple.png"),
+       width = 12,
+       height = 8,
+       units = "cm",
+       dpi = 300)
+
+
+# relationship between variable and estimated richness --------------------
+
+# prediction for purple group
+model_purple <- lm(estimated ~ cc10, 
+                   data = diversity_model_data)
+
+prediction_cov_purple <- diversity_model_data %>%
+  # main plot
+  ggplot(aes(x = cc10, y = estimated)) +
+  geom_smooth(method = "lm", linewidth = 2,
+              colour = "#7A67EE", fill = "#CAE1FF") +
+  geom_point(colour = "#473C8B") +
+  ylim(12, 14) +
+  # fine tune
+  theme_bw() +
+  labs(x = "Average crown closure above 10m", 
+       y = "Asymptotic richness") +
+  theme(axis.title = element_text(size = 16),
+        axis.text = element_text(size = 12),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+        axis.title.x = element_text(margin = margin(t = 10, r = 0, b = , l = 0)))
+  
+
+# prediction for orange group 
+model_orange <- lm(estimated ~ prop_decid, 
+                   data = diversity_model_data)
+
+prediction_cov_oragne <- diversity_model_data %>%
+  # main plot
+  ggplot(aes(x = prop_decid, y = estimated)) +
+  geom_smooth(method = "lm", linewidth = 2,
+              colour = "#EE9A00", fill = "peachpuff") +
+  geom_point(colour = "#8B5742") +
+  ylim(5, 7) +
+  # fine tune
+  theme_bw() +
+  labs(x = "Proportion of deciduous tree counts", 
+       y = "Asymptotic richness") +
+  theme(axis.title = element_text(size = 16),
+        axis.text = element_text(size = 12),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+        axis.title.x = element_text(margin = margin(t = 10, r = 0, b = , l = 0)))
+
+
+# prediction for green group
+model_green <- lm(estimated ~ aspect_sin, 
+                   data = diversity_model_data)
+
+prediction_cov_green <- diversity_model_data %>%
+  # main plot
+  ggplot(aes(x = aspect_sin, y = estimated)) +
+  geom_smooth(method = "lm", linewidth = 2,
+              colour = "#548B54", fill = "#8FBC8F") +
+  geom_point(colour = "#556B2F") +
+  #ylim(5, 7) +
+  # fine tune
+  theme_bw() +
+  labs(x = "Aspect (sin)", 
+       y = "Asymptotic richness") +
+  theme(axis.title = element_text(size = 16),
+        axis.text = element_text(size = 12),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
+        axis.title.x = element_text(margin = margin(t = 10, r = 0, b = , l = 0)))
+
+
+# save the figure
+prediction_cov_purple
+prediction_cov_orange
+prediction_cov_green
+
+# save the figure
+ggsave(plot = prediction_cov_green,
+       filename = here("docs", "figures", "prediction_cov_green.png"),
+       width = 10,
+       height = 10,
        units = "cm",
        dpi = 300)

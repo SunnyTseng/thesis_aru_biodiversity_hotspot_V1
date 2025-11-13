@@ -68,6 +68,8 @@ ggsave(plot = Hills_vis,
 
 Hills_curves <- Hills %>%
   
+  filter(site != "14_02") %>%
+  
   # group the data by the number of ARU days
   mutate(survey_effort = case_when(site_ARU_days < 90 ~ "Low",
                                    site_ARU_days >= 90 & site_ARU_days <= 120 ~ "Medium",
@@ -84,7 +86,7 @@ Hills_curves <- Hills %>%
                       # iNEXT result shown by plot
                       ggiNEXT(., type = 1, se = FALSE) +
                       labs(x = "ARU days", y = "No. species") +
-                      scale_color_manual(values = rep("grey40", 59)) +  # set line color for 59 sites
+                      scale_color_manual(values = rep("#7A8B8B", 59)) +  # set line color for 59 sites
                       scale_fill_manual(values = rep("grey80", 59)) +     # set ribbon fill for 59 sites
                       
                       # set theme
