@@ -224,10 +224,43 @@ ggsave(plot = var_selec_3,
 # variable selection ------------------------------------------------------
 
 diversity_model_data <- diversity_model_data %>%
-select(site, observed, estimated,
-       dem, slope, aspect_sin, aspect_cos, d_lid_rip_wet_str_le, d_vri_polyedge, 
-       cc1_3, cc3_10, cc10,
-       age_80, prop_decid) 
+  select(site, observed, estimated,
+         dem, slope, aspect_sin, aspect_cos, d_lid_rip_wet_str_le, d_vri_polyedge, 
+         cc1_3, cc3_10, cc10,
+         age_80, prop_decid) 
+
+
+plot_data <- diversity_model_data %>%
+  select(estimated, dem, slope, aspect_sin, aspect_cos, d_lid_rip_wet_str_le, d_vri_polyedge, 
+         cc1_3, cc3_10, cc10,
+         age_80, prop_decid) %>%
+  pivot_longer(cols = c(dem, slope, aspect_sin, aspect_cos, d_lid_rip_wet_str_le, d_vri_polyedge, 
+                        cc1_3, cc3_10, cc10,
+                        age_80, prop_decid),
+               names_to = "covariate",
+               values_to = "value")
+
+ggplot(plot_data, aes(x = value, y = estimated)) +
+  geom_point(alpha = 0.5, size = 1) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 0.8) +
+  facet_wrap(~ covariate, scales = "free_x") +
+  labs(
+    x = "LiDAR covariate value",
+    y = "Estimated species richness",
+    title = "Relationships between estimated richness and LiDAR covariates"
+  ) +
+  theme_bw() +
+  theme(
+    strip.text = element_text(size = 10),
+    plot.title = element_text(face = "bold")
+  )
+
+
+
+
+
+
+
 
 
 # fit the full model and all the possible combinations of the variables

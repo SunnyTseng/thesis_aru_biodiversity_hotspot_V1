@@ -86,9 +86,17 @@ effort_change <- ggplot(data = vis_wrangling_1) +
         axis.text = element_text(size = 12),
         legend.title = element_blank(),
         legend.text = element_text(size = 14),
-        legend.position = c(0.08, 0.75),
-        axis.title.y = element_text(margin = margin(t = 0, r = 0, b = 0, l = 0)),
+        legend.position = c(0.08, 0.7),
+        axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0)),
         axis.title.x = element_text(margin = margin(t = 5, r = 0, b = 0, l = 0)))
+
+
+ggsave(effort_change,
+       filename = here("docs", "figures", "effort_change.png"),
+       width = 22,
+       height = 6,
+       units = "cm",
+       dpi = 300)  
 
 
 # days with active ARUs for each of the site  -----------------------------
@@ -195,9 +203,55 @@ ggsave(filename = here("docs", "figures", "ARU_effort.png"),
   
   
   
-  
-  
-  
-  
 
+# extra try for making the map with richness info -------------------------
+
+load("G:/PhD thesis/Ch4_biodiversity_hotspot_V1/data/iNEXT_model/Hills.rda")
+
+site_richness <- Hills %>%
+  mutate(richness = map_int(.x = species_matrix, .f =~ dim(.x)[1])) %>%
+  select(site, richness)
+
+
+richness_map <- read_csv(here("data", "map", "JPRF_all_sites.csv")) %>%
+  left_join(map_wrangling, by = join_by(Name == site)) %>%
+  left_join(site_richness, by = join_by(Name == site)) %>%
+  st_as_sf(coords = c("X", "Y"), crs = st_crs(4326)) %>%
+  
+  ggplot() +
+  annotation_map_tile(type = "cartolight", zoom = 11) +
+  #geom_sf(data = jprf_poly, colour = "darkgrey", fill = "#FFC0CB", 
+  #        size = 1, alpha = 0.2) +
+  geom_sf(colour = "#8B636C", size = 1, alpha = 0.5) +
+  geom_sf(aes(size = days, colour = richness), alpha = 0.5) +
+  # fine tune
+  annotation_scale(location = "tl",
+                   width_hint = 0.4,
+                   pad_y = unit(0.2, "in")) +
+  annotation_north_arrow(style = north_arrow_fancy_orienteering,
+                         location = "tl",
+                         pad_x = unit(0.0, "in"), pad_y = unit(0.2, "in"),
+                         height = unit(2, "cm"),
+                         width = unit(2, "cm")) +
+  labs(x = 'Easting', y = 'Northing', size = 'No. of days') +
+  scale_size_continuous(range = c(1, 15)) +
+  scale_colour_gradientn(colours = c("#769fca", "#a2d1e6", "#ff6c65"), 
+                        trans = scales::pseudo_log_trans(sigma = 0.01)) +
+  # theme
+  theme_bw() +
+  theme(axis.title = element_text(size = 16),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        axis.title.x = element_text(margin = margin(t = 10, r = 0, b = 0, l = 0)),
+        axis.title.y = element_text(margin = margin(t = 0, r = 5, b = 0, l = 0)))
+  
+richness_map
+
+ggsave(richness_map,
+       filename = here("docs", "figures", "richness_map_with_arrow.png"),
+       width = 28,
+       height = 16,
+       units = "cm",
+       dpi = 300)
 
