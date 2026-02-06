@@ -255,3 +255,48 @@ ggsave(richness_map,
        units = "cm",
        dpi = 300)
 
+
+
+# map with predicted richness ---------------------------------------------
+
+diversity_model_data
+
+
+## site location, a total of 66 sites, in WGS84
+sites <- read_csv(here("data", "map", "JPRF_all_sites.csv")) %>%
+  st_as_sf(coords = c("X", "Y"), crs = st_crs(4326)) 
+
+## JPRF grid, reprojected to WGS84
+grid_JPRF <- vect(here("data", "map", "JPRF Grid")) %>%
+  project(sites) %>%
+  st_as_sf() %>%
+  left_join(diversity_model_data)
+
+## North grid, reprojected to WGS84
+grid_North <- vect(here("data", "map", "North Grid Jprf")) %>%
+  project(sites) %>%
+  drop_na(site) %>%
+  st_as_sf() %>%
+  left_join(diversity_model_data) 
+
+
+## start plot
+predicted_richness_map <- ggplot() +
+  geom_sf(data = grid_JPRF, aes(fill = estimated), alpha = 0.5) +
+  geom_sf(data = grid_North, aes(fill = estimated), alpha = 0.5) +
+  geom_sf(data = sites) +
+  
+  scale_fill_viridis_c(option = "E", na.value = "transparent") 
+  #theme_nothing()
+
+predicted_richness_map
+
+ggsave(predicted_richness_map,
+       filename = here("docs", "figures", "predicted_richness_map.png"),
+       width = 28,
+       height = 16,
+       units = "cm",
+       dpi = 300)
+
+
+
